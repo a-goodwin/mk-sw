@@ -15,30 +15,33 @@
 #include <netinet/tcp.h>
 #include <errno.h>
 
+
 #include <ugpio/ugpio.h>
 //#include <time.h>
+#include "globals.h"
+#include "queue.h"
+#include "i2cpacket.h"
 
-#ifndef __cplusplus
-# define false 0
-# define true 1
-typedef unsigned char bool;
-#endif
 
-static const char* ver="0.04t alpha ip gpio";
+static const char* ver=VER_STR;
 
 // program control vars
 //static const char *defPath = "/var";
-static const char* logFName = "/var/log/ip2c.log";
+static const char* logFName = LOG_FNAME;
+static int rq;
+
 static int dMode = 1;
 static bool eStatus = 0;
 
 // tcp control vars
-#define C_KT_COUNT 4
 static const unsigned short sockPortBase = 7000;
 static const int sockCount = C_KT_COUNT;
 
 static struct sockaddr_in serv_addr[C_KT_COUNT];
-static int listenfd[C_KT_COUNT], connfd[C_KT_COUNT];
+static int listenfd[C_KT_COUNT];
+
+int connfd[C_KT_COUNT];
+
 static char sendBuf[1025];
 static char recvBuf[1025];
 //static time_t ticks;
@@ -53,11 +56,13 @@ int gpio_init(void);
 void sock_init(void);
 void sock_poll(void);
 
+
+
 int main(int argc, char **argv, char **envp)
 {
     ///
-        int i;
-        int rq, rv;
+        //int i;
+        //int rv;
         //int gpio;
     ///
 
@@ -110,7 +115,7 @@ int main(int argc, char **argv, char **envp)
         perror("error in GPIO_INIT");
         return EXIT_FAILURE;
     }
-    // init i2c
+    // DONE init i2c
     // init i2c_queue
     // DONE: init tcp sockets
     sock_init();
@@ -128,7 +133,10 @@ int main(int argc, char **argv, char **envp)
             printf("GPIO %i -> %i\r\n", irqPin, value);
             ov = value;
         }
-        sleep(1);
+        if (value!=0) {
+            i2c_poll();
+        }
+        //sleep(1);
     }
 
     // unexport the gpio
@@ -153,7 +161,7 @@ void term(int signum)
 
 int gpio_init(void)
 {
-    int rq, rv;
+    int rv;
     // check if gpio is already exported
     if ((rq = gpio_is_requested(irqPin)) < 0)
     {
@@ -245,3 +253,4 @@ void sock_poll(void)
         }
     }
 }
+
