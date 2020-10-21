@@ -6,8 +6,8 @@
 #define I2C_REG_TX_SIZE 2 // size of bytes lasts in tx buffer and ready to send to uart
 #define I2C_REG_TX_DATA 3 // register to add bytes to tx buffer
 
-int devHasData(int devId);
-int devGetPacket(int devId, unsigned char *bufptr, int size);
+void printPacket(unsigned char* buf);
+int devGetPacket(int devId, unsigned char *bufptr);
 int devSendPacket(int devId, unsigned char *buf, int size);
 
 void i2c_poll(void);

@@ -4,62 +4,80 @@
 #include <sys/socket.h>
 #include "globals.h"
 
-static int devAdresses[C_KT_COUNT] = {0x68};
+static int devAdresses[C_KT_COUNT] = {0x68,0x69, 0x6A, 0x6B};
 
-extern int connfd[C_KT_COUNT];
+//extern int connfd[C_KT_COUNT];
 
-#define OBUF_SZ 256
-static unsigned char obuf[OBUF_SZ];
+#define BUF_SZ 256
+//xstatic unsigned char obuf[BUF_SZ]; // eth to i2c stream buffer
+static unsigned char ibuf[BUF_SZ]; // i2c to eth stream buffer
+
 static int psz=0;
 
 void i2c_poll(void)
 {
     int i=0;
     int addr;
-    int sz;
     //int ret;
     for (i=0; i<C_KT_COUNT; i++) {
         addr = devAdresses[i];
         // poll that i2c has data
-        sz = devHasData(addr);
-        if (sz) {
-            printf("i2c%i x%02x: has %i data\r\n", i, addr, sz);
-            //psz = sz;
-            psz = devGetPacket(addr, obuf, sz);
-            obuf[psz]='\0';
-            printf("i2c%i x%02x data: (%s)\r\n", i, addr, obuf);
-            if (connfd[i]>0) write(connfd[i], obuf, (size_t)psz);
+        memset(ibuf, 0, C_PKT_HDR_SZ);
+        psz = devGetPacket(addr, ibuf);
+        if (psz) {
+            printf("i2c%i x%02x: has %i data\r\n", i, addr, psz);
+            //ibuf[psz]='\0';
+            printPacket(ibuf);
+            if (connfd[i]>0) write(connfd[i], ibuf, (size_t)psz);
+            break; // if there's a packet in one stm,
+                   //no check other stms for packet!
         }
     }
 }
 
-
-int devHasData(int devId)
-{
-    int ret=0;
-    int v=0;
-    printf("i2c_rb 0\r\n");
-    ret = i2c_readByte(0, devId, I2C_REG_RX_SIZE, &v);
-    if (ret==EXIT_SUCCESS) return v; else return 0;
-}
-
-int devGetPacket(int devId, unsigned char *bufptr, int size)
+int devGetPacket(int devId, unsigned char *bufptr)
 {
     int ret;
-    printf("i2c_r 1 %i\r\n", size);
-    ret = i2c_read(0, devId, I2C_REG_RX_DATA, bufptr, size);
+    int size;
+    unsigned char *psz = bufptr+4;
+    ret = i2c_readRaw(0, devId, bufptr, C_PKT_HDR_SZ);
+    size = C_PKT_HDR_SZ;
+    if (*psz!=0) { // read data and dcrc
+        ret |= i2c_readRaw(0, devId, bufptr+size, (*psz)+1);
+        size += (*psz)+1;
+    }
     if (ret==EXIT_SUCCESS) return size; else return 0;
 }
 
 int devSendPacket(int devId, unsigned char *buf, int size)
 {
     int ret;
-    int txSz=0;
-    printf("i2c_rb 2\r\n");
-    ret = i2c_readByte(0, devId, I2C_REG_TX_SIZE, &txSz);
-    if (ret==EXIT_FAILURE) return EXIT_FAILURE;
-    else if (txSz) return EXIT_FAILURE;
-    printf("i2c_wB 3\r\n");
-    ret = i2c_writeBuffer(0, devId, 3, buf, size);
+    int addr = devAdresses[devId];
+
+    printf("i2c_wBuf %i: %i\r\n", devId, size);
+    ret = i2c_writeBufferRaw(0, addr, buf, size);
     return ret;
 }
+
+void printPacket(unsigned char *buf)
+{
+    unsigned char *psz = buf+4;
+    int i=0;
+    if (*(buf)!=0xf5 || *(buf)!=0x5f || *(buf)!=0xf7) {
+        printf("invalid sign: 0x%02x\r\n", *buf);
+        return;
+    }
+    if (*(buf)!=0xf7) {
+        printf("pkt 0x%02x @0x%04x sz 0x%02x crc 0x%02x ",
+               *(buf+3),
+               (unsigned short)(*(buf+1)),
+               *psz,
+               *(buf+5));
+        if ((*psz)!=0) {
+            for (i=0; i<=(*psz); i++) printf("%02X ", *(buf+6+i));
+        }
+        printf("\r\n");
+        return;
+    }
+}
+

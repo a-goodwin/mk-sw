@@ -8,11 +8,16 @@
 typedef unsigned char bool;
 #endif
 
-#define VER_STR "0.06t alpha ip gpio i2c"
-#define C_KT_COUNT 1
+#define VER_STR "0.08t alpha <-ip-> gpio <-i2c->"
+
+#define C_KT_COUNT 4
 #define LOG_FNAME "/var/log/ip2c.log"
 
-extern int connfd[C_KT_COUNT];
+#define C_PKT_HDR_SZ 6
+#define C_UART_NAME "/dev/ttyUSB0"
+#define C_GPIO_SIGNAL_VALUE 0
+
+extern int connfd[C_KT_COUNT+1];
 
 
 #endif // GLOBALS_H

@@ -35,12 +35,12 @@ static bool eStatus = 0;
 
 // tcp control vars
 static const unsigned short sockPortBase = 7000;
-static const int sockCount = C_KT_COUNT;
+static const int sockCount = C_KT_COUNT+1;
 
-static struct sockaddr_in serv_addr[C_KT_COUNT];
-static int listenfd[C_KT_COUNT];
+static struct sockaddr_in serv_addr[C_KT_COUNT+1];
+static int listenfd[C_KT_COUNT+1];
 
-int connfd[C_KT_COUNT];
+int connfd[C_KT_COUNT+1];
 
 static char sendBuf[1025];
 static char recvBuf[1025];
@@ -72,8 +72,9 @@ int main(int argc, char **argv, char **envp)
 
     int ret;
     int opt;
-
+    int nkt = C_KT_COUNT;
     printf("IP2C process ver %s \r\n", ver);
+    printf("%i KT ports\r\n", nkt);
     // check console args
     while((opt=getopt(argc, argv, "nh")) != -1) {
         switch (opt) {
@@ -121,23 +122,25 @@ int main(int argc, char **argv, char **envp)
     sock_init();
 
 
-    // main loop
+/////////// main loop ///////////////
     printf("Starting main cycle!\r\n");
     while(!eStatus) {
         // poll socket
         sock_poll();
 
-        // poll gpio
+        // poll gpio and i2c
         value = gpio_get_value(irqPin);
         if (value != ov) {
             printf("GPIO %i -> %i\r\n", irqPin, value);
             ov = value;
         }
-        if (value!=0) {
+        if (value==C_GPIO_SIGNAL_VALUE) {
             i2c_poll();
         }
         //sleep(1);
     }
+
+
 
     // unexport the gpio
     if (!rq) {
@@ -232,7 +235,7 @@ void sock_poll(void)
             }
         }
     }
-
+    // poll for data
     for (i=0; i<sockCount; i++) {
         //printf("-\r\n");
         if (connfd[i]>0) { // poll connected sockets for data
@@ -241,9 +244,14 @@ void sock_poll(void)
                 n = read(connfd[i], recvBuf, sizeof(recvBuf)-1);
                 //printf("!\r\n");
                 if (n>0) { // data received!
-                    printf("@%i: %s\r\n", i+sockPortBase, recvBuf);
-                    // TODO: send to queue
-                    n = write(connfd[i], "OK\r\n", 4);
+                    printf("@%i: packet(%i)\r\n", i+sockPortBase, n);
+                    printPacket((unsigned char*)recvBuf);
+                    // send to i2c
+                    if (i>0) devSendPacket(i-1, (unsigned char*)recvBuf, n);
+                    else {
+                        // TODO: send packet po KPN via uart
+                    }
+                    //n = write(connfd[i], "OK\r\n", 4);
                 }
             } else { // socket is gone
                 printf("%i: %i gone, clearing\r\n", i, connfd[i]);
