@@ -134,11 +134,12 @@ int main(int argc, char **argv, char **envp)
             printf("GPIO %i -> %i\r\n", irqPin, value);
             ov = value;
         }
-        if (value==C_GPIO_SIGNAL_VALUE) {
+        //if (value==C_GPIO_SIGNAL_VALUE) {
             i2c_poll();
-        }
+        //}
         //sleep(1);
     }
+/////////////////////////////////////
 
 
 

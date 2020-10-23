@@ -5,6 +5,7 @@ CONFIG -= qt
 
 SOURCES += \
         i2cpacket.c \
+        i2cread.c \
         main.c \
         queue.c
 

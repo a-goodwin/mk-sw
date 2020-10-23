@@ -8,9 +8,9 @@
 typedef unsigned char bool;
 #endif
 
-#define VER_STR "0.08t alpha <-ip-> gpio <-i2c->"
+#define VER_STR "0.10 alpha <-ip-> gpio <-i2c->"
 
-#define C_KT_COUNT 4
+#define C_KT_COUNT 1
 #define LOG_FNAME "/var/log/ip2c.log"
 
 #define C_PKT_HDR_SZ 6

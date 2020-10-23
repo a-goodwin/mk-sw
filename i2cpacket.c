@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include "globals.h"
 
-static int devAdresses[C_KT_COUNT] = {0x68,0x69, 0x6A, 0x6B};
+static int devAdresses[C_KT_COUNT] = {0x6e, 0x4e, 0x70, 0x71};
 
 //extern int connfd[C_KT_COUNT];
 
@@ -41,6 +41,7 @@ int devGetPacket(int devId, unsigned char *bufptr)
     int size;
     unsigned char *psz = bufptr+4;
     ret = i2c_readRaw(0, devId, bufptr, C_PKT_HDR_SZ);
+    if (bufptr[0]!=0xff && bufptr[0]!=0xf5 && bufptr[0]!=0x5f && bufptr[0]!=0xf6) return 0;
     size = C_PKT_HDR_SZ;
     if (*psz!=0) { // read data and dcrc
         ret |= i2c_readRaw(0, devId, bufptr+size, (*psz)+1);
@@ -63,11 +64,11 @@ void printPacket(unsigned char *buf)
 {
     unsigned char *psz = buf+4;
     int i=0;
-    if (*(buf)!=0xf5 || *(buf)!=0x5f || *(buf)!=0xf7) {
+    if (*(buf)!=0xf5 && *(buf)!=0x5f && *(buf)!=0xf6 && *(buf)!=0xf7) {
         printf("invalid sign: 0x%02x\r\n", *buf);
         return;
     }
-    if (*(buf)!=0xf7) {
+    if (*(buf)!=0xf6) {
         printf("pkt 0x%02x @0x%04x sz 0x%02x crc 0x%02x ",
                *(buf+3),
                (unsigned short)(*(buf+1)),
