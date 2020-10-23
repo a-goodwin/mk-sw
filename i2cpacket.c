@@ -31,7 +31,7 @@ void i2c_poll(void)
             if (connfd[i]>0) write(connfd[i], ibuf, (size_t)psz);
             break; // if there's a packet in one stm,
                    //no check other stms for packet!
-        }
+        } else     printf(".\r\n");
     }
 }
 
@@ -41,7 +41,9 @@ int devGetPacket(int devId, unsigned char *bufptr)
     int size;
     unsigned char *psz = bufptr+4;
     ret = i2c_readRaw(0, devId, bufptr, C_PKT_HDR_SZ);
-    if (bufptr[0]!=0xff && bufptr[0]!=0xf5 && bufptr[0]!=0x5f && bufptr[0]!=0xf6) return 0;
+    if (bufptr[0]!=0xff && bufptr[0]!=0xf5 && bufptr[0]!=0x5f && bufptr[0]!=0xf6) {
+        return 0;
+    }
     size = C_PKT_HDR_SZ;
     if (*psz!=0) { // read data and dcrc
         ret |= i2c_readRaw(0, devId, bufptr+size, (*psz)+1);
@@ -82,3 +84,10 @@ void printPacket(unsigned char *buf)
     }
 }
 
+
+void _i2c_read(int devId, char *buffer, int reqBytes)
+{
+    int ret;
+    ret = i2c_readRaw(0, devId, buffer, reqBytes);
+
+}

@@ -7,13 +7,13 @@ TARGET3 := queue
 
 all: main i2cread
 
-i2cread: i2cread.o i2cpacket.o
+i2cread: i2cread.o
 	@echo linking i2cread
-	$(CC) $(CFLAGS) i2cread.o i2cpacket.o -o i2cread $(LDFLAGS) -l onioni2c -l oniondebug
+	$(CC) $(CFLAGS) i2cread.o -o i2cread $(LDFLAGS) -l onioni2c -l oniondebug
 
 i2cread.o:
 	@echo "compiling i2cread"
-	$(CC) -c $(CFLAGS) i2cread.c
+	$(CC) -c $(CFLAGS) i2cread.c -l onioni2c -l oniondebug
 
 main: main.o i2cpacket.o queue.o
 	@echo "Linking main"
