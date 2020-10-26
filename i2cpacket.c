@@ -58,19 +58,20 @@ int devSendPacket(int devId, unsigned char *buf, int size)
     ret = i2c_writeBufferRaw(0, addr, buf, size);
     return ret;
 }
-
+#pragma pack(push, 1)
 void printPacket(unsigned char *buf)
 {
     unsigned char *psz = buf+4;
+    unsigned short addr = buf[1] << 8 | buf[2];
     int i=0;
-    if (*(buf)!=0xf5 || *(buf)!=0x5f || *(buf)!=0xf7) {
+    if (*(buf)!=0xf5 && *(buf)!=0x5f && *(buf)!=0xf7 && *(buf)!=0xf6) {
         printf("invalid sign: 0x%02x\r\n", *buf);
         return;
     }
-    if (*(buf)!=0xf7) {
+    if (*(buf)!=0xf7 && *(buf)!=0xf6) {
         printf("pkt 0x%02x @0x%04x sz 0x%02x crc 0x%02x ",
                *(buf+3),
-               (unsigned short)(*(buf+1)),
+               addr,
                *psz,
                *(buf+5));
         if ((*psz)!=0) {
@@ -80,4 +81,4 @@ void printPacket(unsigned char *buf)
         return;
     }
 }
-
+#pragma pack(pop)
