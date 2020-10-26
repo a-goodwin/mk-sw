@@ -51,12 +51,9 @@ static const int irqPin = 18;
 
 void term(int signum);
 
-int gpio_init(void);
-
+int  gpio_init(void);
 void sock_init(void);
 void sock_poll(void);
-
-
 
 int main(int argc, char **argv, char **envp)
 {
@@ -122,7 +119,7 @@ int main(int argc, char **argv, char **envp)
     sock_init();
 
 
-/////////// main loop ///////////////
+    /////////// main loop ///////////////
     printf("Starting main cycle!\r\n");
     while(!eStatus) {
         // poll socket
@@ -139,7 +136,7 @@ int main(int argc, char **argv, char **envp)
         }
         //sleep(1);
     }
-/////////////////////////////////////
+    /////////////////////////////////////
 
 
 
@@ -155,7 +152,6 @@ int main(int argc, char **argv, char **envp)
     printf("goodbye!\r\n");
     return 0;
 }
-
 
 void term(int signum)
 {
@@ -205,10 +201,13 @@ void sock_init(void)
         connfd[i] = -1;
 
         fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+        listenfd[i]=-1;
         if (fd<0) {
             printf("socket creating error %i\r\n", i);
+            continue;
         }
         listenfd[i] = fd;
+
         serv_addr[i].sin_family = AF_INET;
         serv_addr[i].sin_addr.s_addr = htonl(INADDR_ANY);
         serv_addr[i].sin_port = htons(sockPortBase + i);
@@ -236,6 +235,7 @@ void sock_poll(void)
             }
         }
     }
+
     // poll for data
     for (i=0; i<sockCount; i++) {
         //printf("-\r\n");
@@ -248,9 +248,11 @@ void sock_poll(void)
                     printf("@%i: packet(%i)\r\n", i+sockPortBase, n);
                     printPacket((unsigned char*)recvBuf);
                     // send to i2c
-                    if (i>0) devSendPacket(i-1, (unsigned char*)recvBuf, n);
-                    else {
-                        // TODO: send packet po KPN via uart
+                    if (i>0) {
+                        devSendPacket(i-1, (unsigned char*)recvBuf, n);
+                    } else { // i==0 - kpn
+                        // TODO: send packet to KPN via uart
+
                     }
                     //n = write(connfd[i], "OK\r\n", 4);
                 }
@@ -262,4 +264,3 @@ void sock_poll(void)
         }
     }
 }
-
