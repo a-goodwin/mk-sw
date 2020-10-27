@@ -3,6 +3,7 @@
 //#include <stdio.h>
 #include <sys/socket.h>
 #include "globals.h"
+#include "sock.h"
 
 static int devAdresses[C_KT_COUNT] = {0x6e, 0x4e, 0x70, 0x71};
 
@@ -27,7 +28,7 @@ void i2c_poll(void)
             printf("i2c%i x%02x: has %i data\r\n", i, addr, psz);
             //ibuf[psz]='\0';
             printPacket(ibuf);
-            if (connfd[i]>0) write(connfd[i], ibuf, (size_t)psz);
+            sock_send(i, ibuf, (size_t)psz);
             break; // if there's a packet in one stm,
                    //no check other stms for packet!
         } else     {};//printf(".\r\n");
@@ -86,7 +87,7 @@ void printPacket(unsigned char *buf)
 }
 #pragma pack(pop)
 
-void _i2c_read(int devId, char *buffer, int reqBytes)
+void _i2c_read(int devId, unsigned char *buffer, int reqBytes)
 {
     int ret;
     ret = i2c_readRaw(0, devId, buffer, reqBytes);

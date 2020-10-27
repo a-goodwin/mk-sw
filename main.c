@@ -9,10 +9,6 @@
 #include <sys/types.h>
 #include <string.h>
 
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
 #include <errno.h>
 
 
@@ -21,7 +17,8 @@
 #include "globals.h"
 #include "queue.h"
 #include "i2cpacket.h"
-
+#include "rs485test/rs485.h"
+#include "sock.h"
 
 static const char* ver=VER_STR;
 
@@ -33,18 +30,13 @@ static int rq;
 static int dMode = 1;
 static bool eStatus = 0;
 
-// tcp control vars
-static const unsigned short sockPortBase = 7000;
-static const int sockCount = C_KT_COUNT+1;
 
-static struct sockaddr_in serv_addr[C_KT_COUNT+1];
-static int listenfd[C_KT_COUNT+1];
-
-int connfd[C_KT_COUNT+1];
-
-static char sendBuf[1025];
-static char recvBuf[1025];
 //static time_t ticks;
+
+// UART port
+static const char* c_kpn_uart_name="/dev/ttyS1";
+extern tDevInst uart;
+tDevInst uart;
 
 // HAL pins and i2c control vars
 static const int irqPin = 18;
@@ -70,6 +62,9 @@ int main(int argc, char **argv, char **envp)
     int ret;
     int opt;
     int nkt = C_KT_COUNT;
+    int uart_size;
+    unsigned char* uart_buf;
+
     printf("IP2C process ver %s \r\n", ver);
     printf("%i KT ports\r\n", nkt);
     // check console args
@@ -117,6 +112,11 @@ int main(int argc, char **argv, char **envp)
     // init i2c_queue
     // DONE: init tcp sockets
     sock_init();
+    // serial device init
+    ret = openDev(c_kpn_uart_name, &uart);
+    if (ret<0) {
+        printf("tty open error\r\n");
+    }
 
 
     /////////// main loop ///////////////
@@ -133,6 +133,13 @@ int main(int argc, char **argv, char **envp)
         }
         if (value==C_GPIO_SIGNAL_VALUE) {
             i2c_poll();
+        }
+
+        // poll uart
+        ret = receiveFSM(&uart);
+        if (ret>0) { //has packet!
+            getPacket(&uart, &uart_size, &uart_buf);
+
         }
         //sleep(1);
     }
@@ -188,79 +195,3 @@ int gpio_init(void)
     return 0;
 }
 
-void sock_init(void)
-{
-    unsigned short i=0;
-    int fd;
-    int ret;
-
-    printf("sock_init()\r\n");
-    memset(&serv_addr, '\0', sizeof(serv_addr));
-    memset(sendBuf, '\0', sizeof(sendBuf));
-    for (i=0; i<sockCount; i++) {
-        connfd[i] = -1;
-
-        fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-        listenfd[i]=-1;
-        if (fd<0) {
-            printf("socket creating error %i\r\n", i);
-            continue;
-        }
-        listenfd[i] = fd;
-
-        serv_addr[i].sin_family = AF_INET;
-        serv_addr[i].sin_addr.s_addr = htonl(INADDR_ANY);
-        serv_addr[i].sin_port = htons(sockPortBase + i);
-        ret = bind(listenfd[i], (struct sockaddr*)&(serv_addr[i]), sizeof(serv_addr));
-        if (ret<0) printf("error in  bind socket %i\r\n", i);
-        ret = listen(listenfd[i], 1);
-        if (ret<0) printf("error in turn socket to listen state %i\r\n", i);
-    }
-}
-
-void sock_poll(void)
-{
-    unsigned short i=0;
-    int fd;
-    int n=0;
-    //printf(".\r\n");
-    for (i=0; i<sockCount; i++) {
-        fd = accept4(listenfd[i], (struct sockaddr*) NULL, NULL, SOCK_NONBLOCK);
-        if (connfd[i]!=fd) {
-            if (fd>0) {
-                if (connfd[i]>0) close(connfd[i]); // the newest connection accepted always, old one disconnects!
-//                printf("accpt: %i: %i ->%i\r\n", i, connfd[i], fd);
-                printf("New conn @%i, fd=%i\r\n", i+sockPortBase, fd);
-                connfd[i] = fd;
-            }
-        }
-    }
-
-    // poll for data
-    for (i=0; i<sockCount; i++) {
-        //printf("-\r\n");
-        if (connfd[i]>0) { // poll connected sockets for data
-            //printf("?\r\n");
-            if (recv(connfd[i],NULL,1, MSG_PEEK | MSG_DONTWAIT) != 0) {
-                n = read(connfd[i], recvBuf, sizeof(recvBuf)-1);
-                //printf("!\r\n");
-                if (n>0) { // data received!
-                    printf("@%i: packet(%i)\r\n", i+sockPortBase, n);
-                    printPacket((unsigned char*)recvBuf);
-                    // send to i2c
-                    if (i>0) {
-                        devSendPacket(i-1, (unsigned char*)recvBuf, n);
-                    } else { // i==0 - kpn
-                        // TODO: send packet to KPN via uart
-
-                    }
-                    //n = write(connfd[i], "OK\r\n", 4);
-                }
-            } else { // socket is gone
-                printf("%i: %i gone, clearing\r\n", i, connfd[i]);
-                close(connfd[i]);
-                connfd[i]=-1;
-            }
-        }
-    }
-}

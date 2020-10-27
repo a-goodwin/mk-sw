@@ -17,7 +17,4 @@ typedef unsigned char bool;
 #define C_UART_NAME "/dev/ttyUSB0"
 #define C_GPIO_SIGNAL_VALUE 0
 
-extern int connfd[C_KT_COUNT+1];
-
-
 #endif // GLOBALS_H
