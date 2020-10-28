@@ -10,7 +10,6 @@ SOURCES += \
         main.c \
         queue.c \
         rs485test/rs485.c \
-        rs485test/rs485usb.cpp \
         sock.c
 
 INCLUDEPATH += /work/omega/source/staging_dir/target-mipsel_24kc_musl/usr/include
@@ -22,7 +21,6 @@ HEADERS += \
     i2cpacket.h \
     queue.h \
     rs485test/rs485.h \
-    rs485test/rs485usb.h \
     sock.h
 
 SUBDIRS += \

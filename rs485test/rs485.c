@@ -103,6 +103,7 @@ int sendPacket(tDevInst *dev, unsigned char *data, unsigned int size)
     if (size>sizeof(dev->pbuf)) return -2;
 
     // send data
+    printf("uart_wBuf: %i\r\n", size);
     i = write(dev->fd, data, size);
     return (int)i;
 }
