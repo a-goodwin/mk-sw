@@ -55,6 +55,24 @@ void sock_init(void)
     }
 }
 
+void sock_done(void)
+{
+    int i;
+    // close all data socket
+    for (i=0; i<sockCount; i++) {
+        if (connfd[i]>0) { // poll connected sockets for data
+            close(connfd[i]);
+        }
+
+        if (listenfd[i]>0) {
+            close(listenfd[i]);
+        }
+    }
+
+    // close all listen socket
+
+}
+
 void sock_send(int i, unsigned char* buf, size_t size)
 {
     if (connfd[i]>0) write(connfd[i], buf, (size_t)size);
@@ -87,7 +105,7 @@ void sock_poll(void)
                 n = read(connfd[i], recvBuf, sizeof(recvBuf)-1);
                 //printf("!\r\n");
                 if (n>0) { // data received!
-                    printf("@%i: packet(%i)\r\n", i+sockPortBase, n);
+                    printf("@%i: packet(%i)\r\n\t", i+sockPortBase, n);
                     printPacket((unsigned char*)recvBuf);
                     // send to i2c
                     if (i>0) {

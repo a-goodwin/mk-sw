@@ -131,7 +131,7 @@ int main(int argc, char **argv, char **envp)
             printf("GPIO %i -> %i\r\n", irqPin, value);
             ov = value;
         }
-        if (value==C_GPIO_SIGNAL_VALUE) {
+        if (value==C_GPIO_ACTIVE_VALUE) {
             i2c_poll();
         }
 
@@ -139,13 +139,17 @@ int main(int argc, char **argv, char **envp)
         ret = receiveFSM(&uart);
         if (ret>0) { //has packet!
             getPacket(&uart, &uart_size, &uart_buf);
-
+            printf("uart has packet\r\n");
+            printPacket(uart_buf);
+            sock_send(0, uart_buf, uart_size);
         }
         //sleep(1);
     }
     /////////////////////////////////////
 
 
+    printf("Closing sockets\r\n");
+    sock_done();
 
     // unexport the gpio
     if (!rq) {

@@ -48,7 +48,10 @@ int devGetPacket(int devId, unsigned char *bufptr)
     if (*psz!=0) { // read data and dcrc
         ret |= i2c_readRaw(0, devId, bufptr+size, (*psz)+1);
         size += (*psz)+1;
-    }
+    } else {
+        ret |= i2c_readRaw(0, devId, bufptr+size, (*psz)+1);
+        size += (*psz)+1;
+    };
     if (ret==EXIT_SUCCESS) return size; else return 0;
 }
 
@@ -73,13 +76,13 @@ void printPacket(unsigned char *buf)
         return;
     }
     if (*(buf)!=0xf7 && *(buf)!=0xf6) {
-        printf("pkt 0x%02x @0x%04x sz 0x%02x crc 0x%02x ",
+        printf("pkt 0x%02x @0x%04x sz 0x%02x hcrc 0x%02x dcrc 0x%02x",
                *(buf+3),
                addr,
                *psz,
-               *(buf+5));
+               *(buf+5), *(buf+6+*psz));
         if ((*psz)!=0) {
-            for (i=0; i<=(*psz); i++) printf("%02X ", *(buf+6+i));
+            for (i=0; i<(*psz); i++) printf("%02X ", *(buf+6+i));
         }
         printf("\r\n");
         return;

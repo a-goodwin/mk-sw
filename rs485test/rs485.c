@@ -11,6 +11,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include "../i2cpacket.h"
 
 int set_interface_attribs (int fd, speed_t speed, int parity)
 {
@@ -33,7 +34,7 @@ int set_interface_attribs (int fd, speed_t speed, int parity)
                                         // no canonical processing
         tty.c_oflag = 0;                // no remapping, no delays
         tty.c_cc[VMIN]  = 0;            // read doesn't block
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        tty.c_cc[VTIME] = 1;            // 0.1 seconds read timeout
 
         tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
 
@@ -63,7 +64,7 @@ void set_blocking (int fd, int should_block)
         }
 
         tty.c_cc[VMIN]  = should_block ? 1 : 0;
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        tty.c_cc[VTIME] = 1;            // 0.5 seconds read timeout
 
         if (tcsetattr (fd, TCSANOW, &tty) != 0)
                 printf("error %d setting term attributes",errno);
@@ -101,7 +102,7 @@ int sendPacket(tDevInst *dev, unsigned char *data, unsigned int size)
     // check device
     if (dev->state!=sOpened) return -1;
     if (size>sizeof(dev->pbuf)) return -2;
-
+    //printPacket(data);
     // send data
     printf("uart_wBuf: %i\r\n", size);
     i = write(dev->fd, data, size);
@@ -120,14 +121,14 @@ int receiveFSM(tDevInst *dev)
     pcb = dev->rcvbuf+dev->ppos; // current byte received
     switch (dev->ppos) {
     case 0: // signature
-        if (*pcb!=MASTER_SIGNATURE && *pcb!=SLAVE_SIGNATURE && *pcb!=REAR_CAR_SIGNATURE && *pcb!=FRONT_CAR_SIGNATURE) {
+        if (*pcb!=SLAVE_SIGNATURE) {
+            printf("bad signature: 0x%02x\r\n", *pcb);
             dev->ppos = 0;
             dev->psize = 0;
             break;
         }
 
-        if (*pcb==MASTER_SIGNATURE || *pcb==SLAVE_SIGNATURE) dev->psize = C_STD_PACKET_SZ;
-        if (*pcb==REAR_CAR_SIGNATURE || *pcb==FRONT_CAR_SIGNATURE) dev->psize = C_SMALL_PACKET_SZ;
+        if (*pcb==SLAVE_SIGNATURE) dev->psize = C_STD_PACKET_SZ;
         dev->ppos += 1;
         break;
 
@@ -150,19 +151,19 @@ int receiveFSM(tDevInst *dev)
         break;
 
     case 4: // size
-        if (*pcb>0) dev->psize = C_STD_PACKET_SZ+(*pcb)+1;
+        dev->psize = C_STD_PACKET_SZ+(*pcb)+1;
         dev->ppos += 1;
         break;
 
     case 5: // hcrc
         dev->ppos += 1;
-        if (dev->psize==C_STD_PACKET_SZ) {
+        if (dev->psize==C_STD_PACKET_SZ) { // zadel for next version oof protocol
             memcpy(dev->pbuf, dev->rcvbuf, dev->psize);
             dev->psize_latch = dev->psize;
             dev->ppos = 0;
             dev->psize = 0;
             return dev->psize_latch;
-        } else
+        }
         break;
 
     default: // data+dcrc

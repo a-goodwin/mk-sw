@@ -15,7 +15,7 @@
 void sock_init(void);
 void sock_send(int i, unsigned char *buf, size_t size);
 void sock_poll(void);
-
+void sock_done(void);
 
 
 #endif // SOCK_H
