@@ -5,7 +5,7 @@
 #include "globals.h"
 #include "sock.h"
 
-static int devAdresses[C_KT_COUNT] = {0x6e, 0x4e, 0x70, 0x71};
+static int devAdresses[C_KT_COUNT] = {0x6e, 0x70, 0x72, 0x74};
 
 //extern int connfd[C_KT_COUNT];
 
@@ -26,11 +26,10 @@ void i2c_poll(void)
         psz = devGetPacket(addr, ibuf);
         if (psz) {
             printf("i2c%i x%02x: has %i data\r\n", i, addr, psz);
-            //ibuf[psz]='\0';
             printPacket(ibuf);
             sock_send(i, ibuf, (size_t)psz);
             break; // if there's a packet in one stm,
-                   //no check other stms for packet!
+                   //no check other stms for packet in that loop!
         } else     {};//printf(".\r\n");
     }
 }
