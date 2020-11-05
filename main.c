@@ -109,6 +109,7 @@ int main(int argc, char **argv, char **envp)
         return EXIT_FAILURE;
     }
     // DONE init i2c
+    i2c_init();
     // init i2c_queue
     // DONE: init tcp sockets
     sock_init();

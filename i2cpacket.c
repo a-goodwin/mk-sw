@@ -4,15 +4,27 @@
 #include <sys/socket.h>
 #include "globals.h"
 #include "sock.h"
+#include "cmdpacket.h"
 
-static int devAdresses[C_KT_COUNT] = {0x6e, 0x70, 0x72, 0x74};
+static int devAdresses[C_KT_COUNT] = {0x32, 0x34, 0x36, 0x38};
 
 //extern int connfd[C_KT_COUNT];
 
-#define BUF_SZ 256
 //xstatic unsigned char obuf[BUF_SZ]; // eth to i2c stream buffer
-static unsigned char ibuf[BUF_SZ]; // i2c to eth stream buffer
+static unsigned char ibuf[BUF_SZ]; // i2c to eth packet buffer
+static unsigned char pbuf[BUF_SZ]; // i2c to eth i2c stream buffer
+
+static tCmdBuf i2cbuf[C_KT_COUNT];
+
+
 static int psz=0;
+void i2c_init(void)
+{
+    int i=0;
+    for (int i=0; i<C_KT_COUNT; i++) {
+        bufclear(&i2cbuf[i]);
+    }
+}
 
 void i2c_poll(void)
 {
@@ -23,7 +35,7 @@ void i2c_poll(void)
         addr = devAdresses[i];
         // poll that i2c has data
         memset(ibuf, 0, C_PKT_HDR_SZ);
-        psz = devGetPacket(addr, ibuf);
+        psz = devGetPacket(i, addr, ibuf);
         if (psz) {
             printf("i2c%i x%02x: has %i data\r\n", i, addr, psz);
             printPacket(ibuf);
@@ -33,26 +45,29 @@ void i2c_poll(void)
         } else     {};//printf(".\r\n");
     }
 }
-
+// TODO: rewrite!
 // iterative function
-int devGetPacket(int devId, unsigned char *bufptr)
+int devGetPacket(int devnum, int devId, unsigned char *bufptr)
 {
     int ret;
-    int size;
-    unsigned char *psz = bufptr+4;
-    ret = i2c_readRaw(0, devId, bufptr, C_PKT_HDR_SZ);
-    if (bufptr[0]!=0xff && bufptr[0]!=0xf5 && bufptr[0]!=0x5f && bufptr[0]!=0xf6) {
-        return 0;
+    tCmdBuf *cmd;
+    unsigned char sz=0;
+    //int szreal;
+    // TODO: read one byte: size
+    ret = i2c_readRaw(0, devId, &sz, 1);
+    if (ret!=EXIT_SUCCESS) return 0;
+    if (sz==0) return 0;
+    // TODO: read (size) bytes
+    ret = i2c_readRaw(0, devId, pbuf, sz);
+    if (ret!=EXIT_SUCCESS) return 0;
+
+    ret = processPacketData(&i2cbuf[devnum], pbuf+1, sz);
+    if (ret>0) { // command: copy data and return it
+        cmd = getCmd();
+        memcpy(bufptr, cmd->data, (unsigned long)cmd->csize);
+        return cmd->csize;
     }
-    size = C_PKT_HDR_SZ;
-    if (*psz!=0) { // read data and dcrc
-        ret |= i2c_readRaw(0, devId, bufptr+size, (*psz)+1);
-        size += (*psz)+1;
-    } else {
-        ret |= i2c_readRaw(0, devId, bufptr+size, (*psz)+1);
-        size += (*psz)+1;
-    };
-    if (ret==EXIT_SUCCESS) return size; else return 0;
+    return 0;
 }
 
 int devSendPacket(int devId, unsigned char *buf, int size)

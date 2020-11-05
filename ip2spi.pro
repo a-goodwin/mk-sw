@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        cmdpacket.c \
         i2cpacket.c \
         i2cread.c \
         i2cwrite.c \
@@ -17,6 +18,7 @@ INCLUDEPATH += /work/omega/source/staging_dir/target-mipsel_24kc_musl/usr/includ
 LIBS += -lugpio -lonioni2c -loniondebug
 
 HEADERS += \
+    cmdpacket.h \
     globals.h \
     i2cpacket.h \
     queue.h \

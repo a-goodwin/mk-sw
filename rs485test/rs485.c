@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <string.h>
 #include "../i2cpacket.h"
+#include "../cmdpacket.h"
 
 int set_interface_attribs (int fd, speed_t speed, int parity)
 {

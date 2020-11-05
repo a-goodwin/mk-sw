@@ -3,13 +3,7 @@
 
 #include <termios.h>
 
-#define C_STD_PACKET_SZ 6
-#define C_SMALL_PACKET_SZ 2
 
-#define MASTER_SIGNATURE 0xf5
-#define SLAVE_SIGNATURE 0x5f
-#define REAR_CAR_SIGNATURE 0xf6
-#define FRONT_CAR_SIGNATURE 0xf7
 
 
 #ifdef __cplusplus
