@@ -34,6 +34,7 @@ void i2c_poll(void)
     }
 }
 
+// iterative function
 int devGetPacket(int devId, unsigned char *bufptr)
 {
     int ret;
