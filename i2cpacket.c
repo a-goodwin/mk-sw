@@ -1,6 +1,6 @@
 #include "i2cpacket.h"
 #include <onion-i2c.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include <sys/socket.h>
 #include "globals.h"
 #include "sock.h"
@@ -34,7 +34,7 @@ void i2c_poll(void)
     for (i=0; i<C_KT_COUNT; i++) {
         addr = devAdresses[i];
         // poll that i2c has data
-        memset(ibuf, 0, C_PKT_HDR_SZ);
+        memset(ibuf, 0, C_PKT_HDR_SZ+1);
         psz = devGetPacket(i, addr, ibuf);
         if (psz) {
             printf("i2c%i x%02x: has %i data\r\n", i, addr, psz);
@@ -58,7 +58,9 @@ int devGetPacket(int devnum, int devId, unsigned char *bufptr)
     if (ret!=EXIT_SUCCESS) return 0;
     if (sz==0) return 0;
     // TODO: read (size) bytes
-    ret = i2c_readRaw(0, devId, pbuf, sz);
+    ret = i2c_readRaw(0, devId, pbuf, sz+1);
+    printf("i2c %i ", devnum);
+    printhex("data", (unsigned char*)pbuf, (int)sz+1);
     if (ret!=EXIT_SUCCESS) return 0;
 
     ret = processPacketData(&i2cbuf[devnum], pbuf+1, sz);
@@ -104,6 +106,17 @@ void printPacket(unsigned char *buf)
     }
 }
 #pragma pack(pop)
+
+void printhex(char* str, unsigned char* buf, int sz)
+{
+
+    int i=0;
+    printf("%s (%i)", str, sz);
+    for (i=0; i<sz; i++) {
+        printf("%02X%s", buf[i], (i<sz-1)? ":":"");
+    }
+    printf("\r\n");
+}
 
 void _i2c_read(int devId, unsigned char *buffer, int reqBytes)
 {

@@ -33,20 +33,21 @@ cmdpacket.o:
 	$(CC) -c $(CFLAGS) cmdpacket.c
 
 sock.o:
-	@echo "============== Compiling sock.c =============="
+	@echo "\r\n============== Compiling sock.c =============="
 	$(CC) -c $(CFLAGS) sock.c
 
 rs485.o:
-	@echo "============== Compiling rs485.c =============="
+	@echo "\r\n============== Compiling rs485.c =============="
 	$(CC) -c $(CFLAGS) rs485test/rs485.c
 
 i2cpacket.o: 
-	@echo "============== Compiling i2cpacket.c =============="
+	@echo "\r\n============== Compiling i2cpacket.c =============="
 	$(CC) -c $(CFLAGS) i2cpacket.c -l onioni2c -l oniondebug
 
 queue.o: 
-	@echo "============== Compiling queue.c =============="
+	@echo "\r\n============== Compiling queue.c =============="
 	$(CC) -c $(CFLAGS) queue.c
 
 clean:
+	@echo "\r\n============== CLEAN ALL =============="
 	@rm -rf *.o main i2cread i2cwrite
