@@ -59,6 +59,10 @@ int devGetPacket(int devnum, int devId, unsigned char *bufptr)
     if (sz==0) return 0;
     // TODO: read (size) bytes
     ret = i2c_readRaw(0, devId, pbuf, sz+1);
+    if (pbuf[0]==0) {
+        printf("i2c %i error in size byte: %i", devnum, pbuf[0]);
+        return 0;
+    }
     printf("i2c %i ", devnum);
     printhex("data", (unsigned char*)pbuf, (int)sz+1);
     if (ret!=EXIT_SUCCESS) return 0;
