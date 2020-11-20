@@ -1,10 +1,10 @@
 # main compiler
-CC := gcc
+CC := g++
 
-all: main i2cread i2cwrite
+all: MAIN I2CREAD I2CWRITE
 
 
-i2cread: i2cread.o
+I2CREAD: i2cread.o
 	@echo "\r\n============== Linking i2cread =============="
 	$(CC) $(CFLAGS) i2cread.o -o i2cread $(LDFLAGS) -l onioni2c -l oniondebug
 
@@ -12,7 +12,7 @@ i2cread.o:
 	@echo "\r\n============== Compiling i2cread.c =============="
 	$(CC) -c $(CFLAGS) i2cread.c -l onioni2c -l oniondebug
 
-i2cwrite: i2cwrite.o
+I2CWRITE: i2cwrite.o
 	@echo "\r\n============== Linking i2cwrite =============="
 	$(CC) $(CFLAGS) i2cwrite.o -o i2cwrite $(LDFLAGS) -l onioni2c -l oniondebug
 
@@ -20,13 +20,21 @@ i2cwrite.o:
 	@echo "\r\n============== Compiling i2cwrite.c =============="
 	$(CC) -c $(CFLAGS) i2cwrite.c -l onioni2c -l oniondebug
 
-main: main.o i2cpacket.o queue.o rs485.o sock.o cmdpacket.o
+MAIN: main.o ctime.o gpio18.o i2cpacket.o queue.o rs485.o sock.o cmdpacket.o
 	@echo "\r\n============== Linking main =============="
-	$(CC) $(CFLAGS) main.o cmdpacket.o i2cpacket.o queue.o rs485.o sock.o -o main $(LDFLAGS) -l ugpio -l onioni2c -l oniondebug
+	$(CC) $(CFLAGS) main.o ctime.o gpio18.o cmdpacket.o i2cpacket.o queue.o rs485.o sock.o -o main $(LDFLAGS) -l ugpio -l onioni2c -l oniondebug
 
 main.o: 
 	@echo "\r\n============== Compiling main.c =============="
 	$(CC) -c $(CFLAGS) main.c
+
+ctime.o:
+	@echo "\r\n============== Compiling ctime.c ============="
+	$(CC) -c $(CFLAGS) ctime.c
+
+gpio18.o:
+	@echo "\r\n============== Compiling gpio18.c ============"
+	$(CC) -c $(CFLAGS) gpio18.c -l ugpio
 
 cmdpacket.o:
 	@echo "\r\n============== Compiling cmdpacket.c =============="
@@ -40,7 +48,7 @@ rs485.o:
 	@echo "\r\n============== Compiling rs485.c =============="
 	$(CC) -c $(CFLAGS) rs485test/rs485.c
 
-i2cpacket.o: 
+i2cpacket.o:
 	@echo "\r\n============== Compiling i2cpacket.c =============="
 	$(CC) -c $(CFLAGS) i2cpacket.c -l onioni2c -l oniondebug
 

@@ -1,5 +1,5 @@
 #!/bin/sh
 
 cp main /root
-cp i2cread /root
-cp i2cwrite /root
+cp i2cread /usr/sbin
+cp i2cwrite /usr/sbin

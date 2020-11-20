@@ -8,6 +8,7 @@
 
 #include "i2cpacket.h"
 #include "rs485test/rs485.h"
+#include "ctime.h"
 
 extern tDevInst uart;
 
@@ -31,7 +32,7 @@ void sock_init(void)
     int fd;
     int ret;
 
-    printf("sock_init()\r\n");
+    printf("%06ul sock_init()\r\n", getms());
     memset(&serv_addr, '\0', sizeof(serv_addr));
     memset(sendBuf, '\0', sizeof(sendBuf));
     for (i=0; i<sockCount; i++) {
@@ -49,7 +50,7 @@ void sock_init(void)
         serv_addr[i].sin_addr.s_addr = htonl(INADDR_ANY);
         serv_addr[i].sin_port = htons(sockPortBase + i);
         ret = bind(listenfd[i], (struct sockaddr*)&(serv_addr[i]), sizeof(serv_addr));
-        if (ret<0) printf("error in  bind socket %i\r\n", i);
+        if (ret<0) printf("error in bind socket %i\r\n", i);
         ret = listen(listenfd[i], 1);
         if (ret<0) printf("error in turn socket to listen state %i\r\n", i);
     }
@@ -75,7 +76,11 @@ void sock_done(void)
 
 void sock_send(int i, unsigned char* buf, size_t size)
 {
-    if (connfd[i]>0) write(connfd[i], buf, (size_t)size);
+    if (connfd[i]>0)
+    {
+        write(connfd[i], buf, size);
+        //printf("socksend %i bytes to fd %i\r\n", size, connfd[i]);
+    }
 }
 
 void sock_poll(void)
@@ -105,7 +110,7 @@ void sock_poll(void)
                 n = read(connfd[i], recvBuf, sizeof(recvBuf)-1);
                 //printf("!\r\n");
                 if (n>0) { // data received!
-                    printf("@%i: packet(%i)\r\n\t", i+sockPortBase, n);
+                    printf("%06ul @%i: packet(%i) ", getms(), i+sockPortBase, n);
                     printPacket((unsigned char*)recvBuf);
                     // send to i2c
                     if (i>0) {
@@ -117,7 +122,7 @@ void sock_poll(void)
                     //n = write(connfd[i], "OK\r\n", 4);
                 }
             } else { // socket is gone
-                printf("%i: %i gone, clearing\r\n", i, connfd[i]);
+                printf("%06ul %i: %i gone, clearing\r\n", getms(), i, connfd[i]);
                 close(connfd[i]);
                 connfd[i]=-1;
             }

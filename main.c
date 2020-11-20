@@ -12,20 +12,20 @@
 #include <errno.h>
 
 
-#include <ugpio/ugpio.h>
 //#include <time.h>
 #include "globals.h"
 #include "queue.h"
 #include "i2cpacket.h"
 #include "rs485test/rs485.h"
 #include "sock.h"
+#include "gpio18.h"
+#include "ctime.h"
 
 static const char* ver=VER_STR;
 
 // program control vars
 //static const char *defPath = "/var";
 static const char* logFName = LOG_FNAME;
-static int rq;
 
 static int dMode = 1;
 static bool eStatus = 0;
@@ -38,12 +38,9 @@ static const char* c_kpn_uart_name="/dev/ttyS1";
 extern tDevInst uart;
 tDevInst uart;
 
-// HAL pins and i2c control vars
-static const int irqPin = 18;
 
 void term(int signum);
 
-int  gpio_init(void);
 void sock_init(void);
 void sock_poll(void);
 
@@ -116,32 +113,26 @@ int main(int argc, char **argv, char **envp)
     // serial device init
     ret = openDev(c_kpn_uart_name, &uart);
     if (ret<0) {
-        printf("tty open error\r\n");
+        printf("tty %s open error\r\n", c_kpn_uart_name);
     }
 
 
     /////////// main loop ///////////////
     printf("Starting main cycle!\r\n");
     while(!eStatus) {
-        // poll socket
+        // poll tcp sockets
         sock_poll();
 
-        // poll gpio and i2c
-        value = gpio_get_value(irqPin);
-        if (value != ov) {
-            printf("GPIO %i -> %i\r\n", irqPin, value);
-            ov = value;
-        }
-        if (value==C_GPIO_ACTIVE_VALUE) {
-            i2c_poll();
-        }
+        // check i2c if gpio pin active
+        i2c_poll();
 
-        // poll uart
+
+        // poll kpn uart
         ret = receiveFSM(&uart);
         if (ret>0) { //has packet!
             getPacket(&uart, &uart_size, &uart_buf);
-            printf("uart has packet\r\n");
-            printPacket(uart_buf);
+            printf("%06ul rs485 in ", getms());
+            printhex("", uart_buf, uart_size);
             sock_send(0, uart_buf, uart_size);
         }
         //sleep(1);
@@ -151,16 +142,7 @@ int main(int argc, char **argv, char **envp)
 
     printf("Closing sockets\r\n");
     sock_done();
-
-    // unexport the gpio
-    if (!rq) {
-        printf("> unexporting gpio\r\n");
-        if (gpio_free(irqPin) < 0)
-        {
-            perror("gpio_free");
-        }
-    }
-
+    gpio_done();
     printf("goodbye!\r\n");
     return 0;
 }
@@ -171,32 +153,4 @@ void term(int signum)
    eStatus = 1;
 }
 
-int gpio_init(void)
-{
-    int rv;
-    // check if gpio is already exported
-    if ((rq = gpio_is_requested(irqPin)) < 0)
-    {
-        perror("gpio_is_requested");
-        return -1;
-    }
-    // export the gpio
-    if (!rq) {
-        printf("> exporting gpio\n");
-        if ((rv = gpio_request(irqPin, NULL)) < 0)
-        {
-            perror("gpio_request");
-            return -2;
-        }
-    }
-
-    // set to input direction
-    printf("> setting to input\n");
-    if ((rv = gpio_direction_input(irqPin)) < 0)
-    {
-        perror("gpio_direction_input");
-        //return EXIT_FAILURE;
-    }
-    return 0;
-}
 

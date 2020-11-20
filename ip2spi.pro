@@ -5,6 +5,8 @@ CONFIG -= qt
 
 SOURCES += \
         cmdpacket.c \
+        ctime.c \
+        gpio18.c \
         i2cpacket.c \
         i2cread.c \
         i2cwrite.c \
@@ -19,7 +21,9 @@ LIBS += -lugpio -lonioni2c -loniondebug
 
 HEADERS += \
     cmdpacket.h \
+    ctime.h \
     globals.h \
+    gpio18.h \
     i2cpacket.h \
     queue.h \
     rs485test/rs485.h \

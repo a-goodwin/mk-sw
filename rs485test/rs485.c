@@ -13,6 +13,7 @@
 #include <string.h>
 #include "../i2cpacket.h"
 #include "../cmdpacket.h"
+#include "../ctime.h"
 
 int set_interface_attribs (int fd, speed_t speed, int parity)
 {
@@ -105,7 +106,7 @@ int sendPacket(tDevInst *dev, unsigned char *data, unsigned int size)
     if (size>sizeof(dev->pbuf)) return -2;
     //printPacket(data);
     // send data
-    printf("uart_wBuf: %i\r\n", size);
+    //printf("uart_wBuf: %i\r\n", size);
     i = write(dev->fd, data, size);
     return (int)i;
 }
@@ -123,7 +124,7 @@ int receiveFSM(tDevInst *dev)
     switch (dev->ppos) {
     case 0: // signature
         if (*pcb!=SLAVE_SIGNATURE) {
-            printf("bad signature: 0x%02x\r\n", *pcb);
+            printf("%06ul bad signature: 0x%02x\r\n", getms(), *pcb);
             dev->ppos = 0;
             dev->psize = 0;
             break;

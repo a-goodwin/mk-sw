@@ -3,9 +3,10 @@
 
 #define BUF_SZ 256U
 
-#define C_STD_PACKET_SZ 6
-#define C_MID_PACKET_SZ 4
-#define C_SMALL_PACKET_SZ 2
+#define C_FULL_PACKET_SZ 7U
+#define C_STD_PACKET_SZ 6U
+#define C_MID_PACKET_SZ 4U
+#define C_SMALL_PACKET_SZ 2U
 
 #define MASTER_SIGNATURE (0xf5U)
 #define SLAVE_SIGNATURE (0x5fU)
