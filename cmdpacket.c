@@ -44,10 +44,13 @@ inline int processPacketData(tCmdBuf* buf, unsigned char* inbuf, int size)
                 break;
             }
             buf->sign = *pcb;
-            if (*pcb==SLAVE_SIGNATURE) buf->csize = C_STD_PACKET_SZ;
-            else if (*pcb==FRONT_CAR_SIGNATURE) buf->csize = C_MID_PACKET_SZ;
-            else if (*pcb==REAR_CAR_SIGNATURE) buf->csize = C_SMALL_PACKET_SZ;
             buf->hcrc = C_HCRC_INIT;
+            if (*pcb==SLAVE_SIGNATURE) buf->csize = C_STD_PACKET_SZ;
+            else if (*pcb==FRONT_CAR_SIGNATURE) {
+                buf->hcrc = C_MID_HCRC_INIT;
+                buf->csize = C_MID_PACKET_SZ;
+            }
+            else if (*pcb==REAR_CAR_SIGNATURE) buf->csize = C_SMALL_PACKET_SZ;
             buf->pos += 1;
             break;
 
@@ -74,18 +77,18 @@ inline int processPacketData(tCmdBuf* buf, unsigned char* inbuf, int size)
             break;
 
         case 3: // cmd id or hcrc if mid_command
+            buf->hcrc ^= *pcb;
             if (buf->csize == C_MID_PACKET_SZ) {
-                if (buf->hcrc!=*pcb) {
+                if (*pcb!=0) {
                     bufclear(buf);
                     break;
                 }
-                printf("mid cmd @0x%04X\r\n", latch.caddr);
-                buf->cid = 0x80; // pack
                 setLatch(buf);
                 bufclear(buf);
+                printf("mid cmd @0x%04X\r\n", latch.caddr);
+                buf->cid = 0x80; // pack
                 return latch.csize;
             }
-            buf->hcrc ^= *pcb;
             buf->pos += 1;
             buf->cid = buf->data[3];
             break;
@@ -130,4 +133,41 @@ inline int processPacketData(tCmdBuf* buf, unsigned char* inbuf, int size)
         } // switch
     } // for
     return 0;
+}
+
+
+#pragma pack(push, 1)
+void printPacket(unsigned char *buf)
+{
+    unsigned char *psz = buf+4;
+    unsigned short addr = buf[1] << 8 | buf[2];
+    int i=0;
+    if (*(buf)!=0xf5 && *(buf)!=0x5f && *(buf)!=0xf7 && *(buf)!=0xf6) {
+        printf("invalid sign: 0x%02x\r\n", buf[0]);
+        return;
+    }
+    if (*(buf)!=0xf7 && *(buf)!=0xf6) {
+        printf("pkt 0x%02x @0x%04x sz 0x%02x hcrc 0x%02x dcrc 0x%02x",
+               *(buf+3),
+               addr,
+               *psz,
+               *(buf+5), *(buf+6+*psz));
+        if ((*psz)!=0) {
+            for (i=0; i<(*psz); i++) printf("%02X ", *(buf+6+i));
+        }
+        printf("\r\n");
+        return;
+    }
+}
+#pragma pack(pop)
+
+void printhex(char* str, unsigned char* buf, int sz)
+{
+
+    int i=0;
+    printf("%s (%i)", str, sz);
+    for (i=0; i<sz; i++) {
+        printf("%02X%s", buf[i], (i<sz-1)? ":":"");
+    }
+    printf("\r\n");
 }

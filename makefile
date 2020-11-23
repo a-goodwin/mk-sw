@@ -1,7 +1,7 @@
 # main compiler
 CC := g++
 
-all: MAIN I2CREAD I2CWRITE
+all: KT-CTRL I2CREAD I2CWRITE KPN-CTRL
 
 
 I2CREAD: i2cread.o
@@ -20,13 +20,21 @@ i2cwrite.o:
 	@echo "\r\n============== Compiling i2cwrite.c =============="
 	$(CC) -c $(CFLAGS) i2cwrite.c -l onioni2c -l oniondebug
 
-MAIN: main.o ctime.o gpio18.o i2cpacket.o queue.o rs485.o sock.o cmdpacket.o
-	@echo "\r\n============== Linking main =============="
-	$(CC) $(CFLAGS) main.o ctime.o gpio18.o cmdpacket.o i2cpacket.o queue.o rs485.o sock.o -o main $(LDFLAGS) -l ugpio -l onioni2c -l oniondebug
+KT-CTRL: kt-ctrl.o ctime.o gpio18.o i2cpacket.o sock.o cmdpacket.o
+	@echo "\r\n============== Linking kt-ctrl =============="
+	$(CC) $(CFLAGS) kt-ctrl.o ctime.o gpio18.o cmdpacket.o i2cpacket.o sock.o -o kt-ctrl $(LDFLAGS) -l ugpio -l onioni2c -l oniondebug
 
-main.o: 
-	@echo "\r\n============== Compiling main.c =============="
-	$(CC) -c $(CFLAGS) main.c
+KPN-CTRL: kpn-ctrl.o ctime.o rs485.o kpn_sock.o cmdpacket.o
+	@echo "\r\n============== Linking kpn-ctrl =============="
+	$(CC) $(CFLAGS) kpn-ctrl.o ctime.o cmdpacket.o rs485.o kpn_sock.o -o kpn-ctrl $(LDFLAGS)
+
+kt-ctrl.o: 
+	@echo "\r\n============== Compiling kt-ctrl.c =============="
+	$(CC) -c $(CFLAGS) kt-ctrl.c
+
+kpn-ctrl.o: 
+	@echo "\r\n============== Compiling kpn-ctrl.c =============="
+	$(CC) -c $(CFLAGS) kpn-ctrl.c
 
 ctime.o:
 	@echo "\r\n============== Compiling ctime.c ============="
@@ -44,6 +52,10 @@ sock.o:
 	@echo "\r\n============== Compiling sock.c =============="
 	$(CC) -c $(CFLAGS) sock.c
 
+kpn_sock.o:
+	@echo "\r\n============== Compiling kpn_sock.c =============="
+	$(CC) -c $(CFLAGS) kpn_sock.c
+
 rs485.o:
 	@echo "\r\n============== Compiling rs485.c =============="
 	$(CC) -c $(CFLAGS) rs485test/rs485.c
@@ -52,9 +64,9 @@ i2cpacket.o:
 	@echo "\r\n============== Compiling i2cpacket.c =============="
 	$(CC) -c $(CFLAGS) i2cpacket.c -l onioni2c -l oniondebug
 
-queue.o: 
-	@echo "\r\n============== Compiling queue.c =============="
-	$(CC) -c $(CFLAGS) queue.c
+#queue.o: 
+#	@echo "\r\n============== Compiling queue.c =============="
+#	$(CC) -c $(CFLAGS) queue.c
 
 clean:
 	@echo "\r\n============== CLEAN ALL =============="

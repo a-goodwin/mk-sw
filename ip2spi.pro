@@ -10,7 +10,9 @@ SOURCES += \
         i2cpacket.c \
         i2cread.c \
         i2cwrite.c \
-        main.c \
+        kpn-ctrl.c \
+        kpn_sock.c \
+        kt-ctrl.c \
         queue.c \
         rs485test/rs485.c \
         sock.c
@@ -25,9 +27,16 @@ HEADERS += \
     globals.h \
     gpio18.h \
     i2cpacket.h \
+    kpn_sock.h \
     queue.h \
     rs485test/rs485.h \
     sock.h
 
 SUBDIRS += \
     rs485test/rs485test.pro
+
+DISTFILES += \
+    inst.sh \
+    makefile \
+    xCompile.sh \
+    xc.sh

@@ -14,6 +14,7 @@
 #include "../i2cpacket.h"
 #include "../cmdpacket.h"
 #include "../ctime.h"
+#include "../globals.h"
 
 int set_interface_attribs (int fd, speed_t speed, int parity)
 {
@@ -124,7 +125,7 @@ int receiveFSM(tDevInst *dev)
     switch (dev->ppos) {
     case 0: // signature
         if (*pcb!=SLAVE_SIGNATURE) {
-            printf("%06ul bad signature: 0x%02x\r\n", getms(), *pcb);
+            printf(CLKHD " bad signature: 0x%02x\r\n", getms(), *pcb);
             dev->ppos = 0;
             dev->psize = 0;
             break;

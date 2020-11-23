@@ -11,8 +11,9 @@
 #define MASTER_SIGNATURE (0xf5U)
 #define SLAVE_SIGNATURE (0x5fU)
 #define REAR_CAR_SIGNATURE (0xf6U)
-#define FRONT_CAR_SIGNATURE (0xf7U)
+#define FRONT_CAR_SIGNATURE (0x54U)
 #define C_HCRC_INIT (0xffU)
+#define C_MID_HCRC_INIT (0x33U)
 #define C_DCRC_INIT (0x00U)
 
 typedef struct {
@@ -34,4 +35,8 @@ tCmdBuf* getCmd(void);
 void bufclear(tCmdBuf *buf);
 void setLatch(tCmdBuf *src);
 int processPacketData(tCmdBuf* buf, unsigned char* inbuf, int size);
+void printhex(char* str, unsigned char* buf, int sz);
+void printPacket(unsigned char* buf);
+
+
 #endif // CMDPACKET_H

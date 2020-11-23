@@ -3,20 +3,15 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
-//#include <iostream>
-
 #include <fcntl.h>
 #include <sys/types.h>
 #include <string.h>
-
 #include <errno.h>
 
-
-//#include <time.h>
 #include "globals.h"
 #include "queue.h"
 #include "i2cpacket.h"
-#include "rs485test/rs485.h"
+//#include "rs485test/rs485.h"
 #include "sock.h"
 #include "gpio18.h"
 #include "ctime.h"
@@ -25,7 +20,7 @@ static const char* ver=VER_STR;
 
 // program control vars
 //static const char *defPath = "/var";
-static const char* logFName = LOG_FNAME;
+static const char* logFName = I2C_LOG_FNAME;
 
 static int dMode = 1;
 static bool eStatus = 0;
@@ -33,16 +28,7 @@ static bool eStatus = 0;
 
 //static time_t ticks;
 
-// UART port
-static const char* c_kpn_uart_name="/dev/ttyS1";
-extern tDevInst uart;
-tDevInst uart;
-
-
 void term(int signum);
-
-void sock_init(void);
-void sock_poll(void);
 
 int main(int argc, char **argv, char **envp)
 {
@@ -110,12 +96,6 @@ int main(int argc, char **argv, char **envp)
     // init i2c_queue
     // DONE: init tcp sockets
     sock_init();
-    // serial device init
-    ret = openDev(c_kpn_uart_name, &uart);
-    if (ret<0) {
-        printf("tty %s open error\r\n", c_kpn_uart_name);
-    }
-
 
     /////////// main loop ///////////////
     printf("Starting main cycle!\r\n");
@@ -125,16 +105,6 @@ int main(int argc, char **argv, char **envp)
 
         // check i2c if gpio pin active
         i2c_poll();
-
-
-        // poll kpn uart
-        ret = receiveFSM(&uart);
-        if (ret>0) { //has packet!
-            getPacket(&uart, &uart_size, &uart_buf);
-            printf("%06ul rs485 in ", getms());
-            printhex("", uart_buf, uart_size);
-            sock_send(0, uart_buf, uart_size);
-        }
         //sleep(1);
     }
     /////////////////////////////////////

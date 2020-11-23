@@ -4,8 +4,10 @@
 
 unsigned int getms(void)
 {
+    unsigned long clk_per_ms = CLOCKS_PER_SEC/1000;
     //struct timeval te;
     //gettimeofday(&te, 0);
-    unsigned int ms = (clock()/(CLOCKS_PER_SEC/1000))%1000000;
-    return ms;
+    unsigned long clk = (unsigned long)clock();
+    unsigned long ms = clk/clk_per_ms;
+    return (unsigned int)ms;
 }
