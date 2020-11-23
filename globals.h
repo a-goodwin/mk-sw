@@ -3,12 +3,12 @@
 
 
 #ifndef __cplusplus
-# define false 0
-# define true 1
+# define false (0)
+# define true (1)
 typedef unsigned char bool;
 #endif
 
-#define VER_STR "0.15 alpha (new i2c proto - block)"
+#define VER_STR "0.16 alpha (new i2c proto - block)"
 #define CLKHD "%09u "
 #define SOCK_PORT_BASE 7000
 #define C_KT_COUNT 4
