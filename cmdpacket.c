@@ -47,7 +47,7 @@ inline int processPacketData(tCmdBuf* buf, unsigned char* inbuf, int size)
             buf->hcrc = C_HCRC_INIT;
             if (*pcb==SLAVE_SIGNATURE) buf->csize = C_STD_PACKET_SZ;
             else if (*pcb==FRONT_CAR_SIGNATURE) {
-                buf->hcrc = C_MID_HCRC_INIT;
+                buf->hcrc = C_MID_HCRC_INIT ^ *pcb;
                 buf->csize = C_MID_PACKET_SZ;
             }
             else if (*pcb==REAR_CAR_SIGNATURE) buf->csize = C_SMALL_PACKET_SZ;
@@ -79,7 +79,7 @@ inline int processPacketData(tCmdBuf* buf, unsigned char* inbuf, int size)
         case 3: // cmd id or hcrc if mid_command
             buf->hcrc ^= *pcb;
             if (buf->csize == C_MID_PACKET_SZ) {
-                if (*pcb!=0) {
+                if (buf->hcrc!=0) {
                     bufclear(buf);
                     break;
                 }

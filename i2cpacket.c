@@ -51,7 +51,7 @@ void i2c_poll(void)
             //    printf(CLKHD " ping (%i)->\r\n", getms(), i);
             //    devSendPacket(i, cpingu, 7); // send ping
             //} else {
-                sock_send(i, ibuf+1, (size_t)psz);
+            sock_send(i, ibuf+1, (size_t)psz);
             //}
             //break; // if there's a packet in one stm,
                    //no check other stms for packet in that loop!
