@@ -1,5 +1,10 @@
 #ifndef SOCK_H
 #define SOCK_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <sys/types.h>
 
 #include <sys/socket.h>
@@ -17,5 +22,8 @@ void sock_send(int i, unsigned char *buf, size_t size);
 void sock_poll(void);
 void sock_done(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SOCK_H

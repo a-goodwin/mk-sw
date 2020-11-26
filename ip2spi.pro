@@ -4,10 +4,11 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        camlist.cpp \
         cmdpacket.c \
-        ctime.c \
+        ctime.cpp \
         gpio18.c \
-        i2cpacket.c \
+        i2cpacket.cpp \
         i2cread.c \
         i2cwrite.c \
         kpn-ctrl.c \
@@ -22,6 +23,7 @@ INCLUDEPATH += /work/omega/source/staging_dir/target-mipsel_24kc_musl/usr/includ
 LIBS += -lugpio -lonioni2c -loniondebug
 
 HEADERS += \
+    camlist.h \
     cmdpacket.h \
     ctime.h \
     globals.h \

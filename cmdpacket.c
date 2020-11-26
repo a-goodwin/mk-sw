@@ -142,12 +142,12 @@ void printPacket(unsigned char *buf)
     unsigned char *psz = buf+4;
     unsigned short addr = buf[1] << 8 | buf[2];
     int i=0;
-    if (*(buf)!=0xf5 && *(buf)!=0x5f && *(buf)!=0xf7 && *(buf)!=0xf6) {
+    if (*(buf)!=MASTER_SIGNATURE && *(buf)!=SLAVE_SIGNATURE && *(buf)!=FRONT_CAR_SIGNATURE) {
         printf("invalid sign: 0x%02x\r\n", buf[0]);
         return;
     }
-    if (*(buf)!=0xf7 && *(buf)!=0xf6) {
-        printf("pkt 0x%02x @0x%04x sz 0x%02x hcrc 0x%02x dcrc 0x%02x",
+    if (*(buf)!=FRONT_CAR_SIGNATURE) {
+        printf("cmd 0x%02x@0x%04x (0x%02x) hc:0x%02x dc:0x%02x :: ",
                *(buf+3),
                addr,
                *psz,
@@ -155,9 +155,11 @@ void printPacket(unsigned char *buf)
         if ((*psz)!=0) {
             for (i=0; i<(*psz); i++) printf("%02X ", *(buf+6+i));
         }
-        printf("\r\n");
-        return;
-    }
+    } else {
+            printf("car: 0x%04x, crc 0x%02x", addr, buf[3]);
+        }
+    printf("\r\n");
+    return;
 }
 #pragma pack(pop)
 

@@ -4,8 +4,8 @@
 extern "C" {
 #endif
 
-unsigned int getms(void);
-
+unsigned long long getms(void);
+unsigned long getms1m(void);
 #ifdef __cplusplus
 }
 #endif

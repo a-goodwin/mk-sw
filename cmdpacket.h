@@ -1,6 +1,11 @@
 #ifndef CMDPACKET_H
 #define CMDPACKET_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #define BUF_SZ 256U
 
 #define C_FULL_PACKET_SZ 7U
@@ -15,7 +20,7 @@
 #define C_HCRC_INIT (0xffU)
 #define C_MID_HCRC_INIT (0x33U)
 #define C_DCRC_INIT (0x00U)
-
+typedef unsigned short t_id;
 typedef struct {
     int pos; // buffer current position and receive fsm
     int csize; // command size, if applicable
@@ -38,5 +43,9 @@ int processPacketData(tCmdBuf* buf, unsigned char* inbuf, int size);
 void printhex(char* str, unsigned char* buf, int sz);
 void printPacket(unsigned char* buf);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CMDPACKET_H

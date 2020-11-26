@@ -9,7 +9,7 @@ typedef unsigned char bool;
 #endif
 
 #define VER_STR "0.16 alpha (new i2c proto - block)"
-#define CLKHD "%09u "
+#define CLKHD "%09lu "
 #define SOCK_PORT_BASE 7000
 #define C_KT_COUNT 4
 #define I2C_LOG_FNAME "/var/log/ip2c.log"

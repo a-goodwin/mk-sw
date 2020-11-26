@@ -20,9 +20,9 @@ i2cwrite.o:
 	@echo "\r\n============== Compiling i2cwrite.c =============="
 	$(CC) -c $(CFLAGS) i2cwrite.c -l onioni2c -l oniondebug
 
-KT-CTRL: kt-ctrl.o ctime.o gpio18.o i2cpacket.o sock.o cmdpacket.o
+KT-CTRL: kt-ctrl.o camlist.o ctime.o gpio18.o i2cpacket.o sock.o cmdpacket.o
 	@echo "\r\n============== Linking kt-ctrl =============="
-	$(CC) $(CFLAGS) kt-ctrl.o ctime.o gpio18.o cmdpacket.o i2cpacket.o sock.o -o kt-ctrl $(LDFLAGS) -l ugpio -l onioni2c -l oniondebug
+	$(CC) $(CFLAGS) kt-ctrl.o camlist.o ctime.o gpio18.o cmdpacket.o i2cpacket.o sock.o -o kt-ctrl $(LDFLAGS) -l ugpio -l onioni2c -l oniondebug
 
 KPN-CTRL: kpn-ctrl.o ctime.o rs485.o kpn_sock.o cmdpacket.o
 	@echo "\r\n============== Linking kpn-ctrl =============="
@@ -36,9 +36,13 @@ kpn-ctrl.o:
 	@echo "\r\n============== Compiling kpn-ctrl.c =============="
 	$(CC) -c $(CFLAGS) kpn-ctrl.c
 
+camlist.o:
+	@echo "\r\n============== Compiling camlist.cpp =============="
+	$(CC) -c $(CFLAGS) camlist.cpp
+
 ctime.o:
-	@echo "\r\n============== Compiling ctime.c ============="
-	$(CC) -c $(CFLAGS) ctime.c
+	@echo "\r\n============== Compiling ctime.cpp ============="
+	$(CC) -c $(CFLAGS) ctime.cpp
 
 gpio18.o:
 	@echo "\r\n============== Compiling gpio18.c ============"
@@ -61,8 +65,8 @@ rs485.o:
 	$(CC) -c $(CFLAGS) rs485test/rs485.c
 
 i2cpacket.o:
-	@echo "\r\n============== Compiling i2cpacket.c =============="
-	$(CC) -c $(CFLAGS) i2cpacket.c -l onioni2c -l oniondebug
+	@echo "\r\n============== Compiling i2cpacket.cpp =============="
+	$(CC) -c $(CFLAGS) i2cpacket.cpp -l onioni2c -l oniondebug
 
 #queue.o: 
 #	@echo "\r\n============== Compiling queue.c =============="

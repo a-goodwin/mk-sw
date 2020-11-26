@@ -46,7 +46,7 @@ int main(int argc, char **argv, char **envp)
     int uart_size;
     unsigned char* uart_buf;
 
-    printf(CLKHD " kpn control process ver %s \r\n", getms(), ver);
+    printf(CLKHD " kpn control process ver %s \r\n", getms1m(), ver);
     printf("kpn uart port %s\r\n", c_kpn_uart_name);
     // check console args
     while((opt=getopt(argc, argv, "nh")) != -1) {
@@ -102,7 +102,7 @@ int main(int argc, char **argv, char **envp)
         ret = receiveFSM(&uart);
         if (ret>0) { //has packet!
             getPacket(&uart, &uart_size, &uart_buf);
-            printf(CLKHD " rs485 pkt ", getms());
+            printf(CLKHD " rs485 pkt ", getms1m());
             printhex("", uart_buf, uart_size);
             kpn_sock_send(uart_buf, uart_size);
         }
@@ -115,7 +115,7 @@ int main(int argc, char **argv, char **envp)
     kpn_sock_done();
     closeDev(&uart);
 
-    printf(CLKHD " goodbye!\r\n", getms());
+    printf(CLKHD " goodbye!\r\n", getms1m());
     return 0;
 }
 

@@ -36,7 +36,7 @@ void kpn_sock_init(void)
     int fd;
     int ret;
     int tr = 1;
-    printf(CLKHD "sock_init()\r\n", getms());
+    printf(CLKHD "sock_init()\r\n", getms1m());
     memset(&serv_addr, '\0', sizeof(serv_addr));
     memset(sendBuf, '\0', sizeof(sendBuf));
     connfd = -1;
@@ -105,13 +105,13 @@ void kpn_sock_poll(void)
             n = read(connfd, recvBuf, sizeof(recvBuf)-1);
             //printf("!\r\n");
             if (n>0) { // data received!
-                printf(CLKHD " @%i: packet(%i) ", getms(), sockPortBase, n);
+                printf(CLKHD " @%i: packet(%i) ", getms1m(), sockPortBase, n);
                 printPacket((unsigned char*)recvBuf);
                 // send packet to KPN via uart
                 sendPacket(&uart, (unsigned char*)recvBuf, n);
             }
         } else { // socket is gone
-            printf(CLKHD " remote %i gone, clearing\r\n", getms(), connfd);
+            printf(CLKHD " remote %i gone, clearing\r\n", getms1m(), connfd);
             close(connfd);
             connfd=-1;
         }

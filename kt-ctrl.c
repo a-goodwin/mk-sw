@@ -105,7 +105,7 @@ int main(int argc, char **argv, char **envp)
 
         // check i2c if gpio pin active
         i2c_poll();
-        //sleep(1);
+        usleep(1000);
     }
     /////////////////////////////////////
 

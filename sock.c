@@ -34,7 +34,7 @@ void sock_init(void)
     int ret;
     int tr = 1;
 
-    printf(CLKHD " sock_init()\r\n", getms());
+    printf(CLKHD " sock_init()\r\n", getms1m());
     memset(&serv_addr, '\0', sizeof(serv_addr));
     memset(sendBuf, '\0', sizeof(sendBuf));
     for (i=0; i<sockCount; i++) {
@@ -114,14 +114,14 @@ void sock_poll(void)
                 n = read(connfd[i], recvBuf, sizeof(recvBuf)-1);
                 //printf("!\r\n");
                 if (n>0) { // data received!
-                    printf(CLKHD " @%i: packet(%i) ", getms(), i+sockPortBase, n);
+                    printf(CLKHD " @%i: ", getms1m(), i+sockPortBase);
                     printPacket((unsigned char*)recvBuf);
                     // send to i2c
                     devSendPacket(i, (unsigned char*)recvBuf, n);
                     //n = write(connfd[i], "OK\r\n", 4);
                 }
             } else { // socket is gone
-                printf(CLKHD " %i: %i gone, clearing\r\n", getms(), i, connfd[i]);
+                printf(CLKHD " %i: %i gone, clearing\r\n", getms1m(), i, connfd[i]);
                 close(connfd[i]);
                 connfd[i]=-1;
             }
