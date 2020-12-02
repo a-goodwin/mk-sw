@@ -7,6 +7,7 @@ SOURCES += \
         camlist.cpp \
         cmdpacket.c \
         ctime.cpp \
+        ethpacket.cpp \
         gpio18.c \
         i2cpacket.cpp \
         i2cread.c \
@@ -26,6 +27,7 @@ HEADERS += \
     camlist.h \
     cmdpacket.h \
     ctime.h \
+    ethpacket.h \
     globals.h \
     gpio18.h \
     i2cpacket.h \
