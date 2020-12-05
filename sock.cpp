@@ -121,7 +121,7 @@ void sock_poll(cKtContainer *kts)
                 //printf("!\r\n");
                 if (n>0) { // data received!
                     printf(CLKHD " @%i: ", getms1m(), i+sockPortBase);
-                    printhex("pkt:",(unsigned char*)recvBuf, n);
+                    printhex("epkt:",(unsigned char*)recvBuf, n);
                     // TODO: parse eth packet and send to kt container
                     ret = ethParser[i]->processEthData(recvBuf, n);
                     if (ret) {

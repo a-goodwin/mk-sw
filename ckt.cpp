@@ -22,12 +22,12 @@ void cKt::setId(unsigned char idx)
 void cKt::sendCmd(unsigned char *cmd, int size)
 {
     // stop command sending and send just one command
-    cmdActive = false;
+    stopCmd();
     durationMs = 0;
     stopTimeMs = 0;
-    infinite = false;
+    printf(CLKHD " kt %i ", getms1m(), m_idx);
+    printhex("pkt ", cmd, size);
     devSendPacket(m_idx, cmd, size);
-
 }
 // TODO: write code for waitfor option - wait for car to repeat command
 void cKt::sendCmdRep(unsigned char *cmd, int size, unsigned int duration, bool waitfor)
@@ -45,6 +45,8 @@ void cKt::sendCmdRep(unsigned char *cmd, int size, unsigned int duration, bool w
         stopTimeMs = repTimer+durationMs;
     }
     if (size>BUF_SZ) size = BUF_SZ;
+    printf(CLKHD " kt %i ", getms1m(), m_idx);
+    printhex("repkt ", curCmd, curSz);
     devSendPacket(m_idx, curCmd, size);
 }
 
@@ -70,6 +72,8 @@ void cKt::eventloop(t_ctime ct)
         // check for repeat timeout
         if (ct-repTimer>repPeriodMs) {// repeat cmd
             repTimer = ct;
+            //printf(CLKHD " kt %i ", getms1m(), m_idx);
+            //printhex("repkt ", curCmd, curSz);
             devSendPacket(m_idx, curCmd, curSz);
         }
     }

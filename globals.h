@@ -8,7 +8,7 @@
 typedef unsigned char bool;
 #endif
 
-#define VER_STR "0.16 alpha (new i2c proto - block)"
+#define VER_STR "0.20 beta (new eth proto, repkt!)"
 #define CLKHD "%09lu "
 #define SOCK_PORT_BASE 7000
 #define C_KT_COUNT 4
