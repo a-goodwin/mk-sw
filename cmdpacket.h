@@ -31,8 +31,16 @@ typedef struct {
     unsigned char dcrc;
     unsigned char data[BUF_SZ];
 } tCmdBuf;
-
-
+#pragma pack(push, 1)
+typedef struct {
+    unsigned char signature;
+    unsigned short address;
+    unsigned char cmd;
+    unsigned char size;
+    unsigned char hcrc;
+    unsigned char data[BUF_SZ];
+} tCmd;
+#pragma pack(pop)
 
 extern tCmdBuf latch;//unsigned char i2cbuf[BUF_SZ]; // i2c receive FSM buffer
 

@@ -15,6 +15,7 @@
 #include "sock.h"
 #include "gpio18.h"
 #include "ctime.h"
+#include "cktcontainer.h"
 
 static const char* ver=VER_STR;
 
@@ -27,6 +28,7 @@ static bool eStatus = 0;
 
 
 //static time_t ticks;
+static cKtContainer *kts;
 
 void term(int signum);
 
@@ -97,19 +99,24 @@ int main(int argc, char **argv, char **envp)
     // DONE: init tcp sockets
     sock_init();
 
+    // kt container class init
+    kts = new cKtContainer();
+
     /////////// main loop ///////////////
     printf("Starting main cycle!\r\n");
     while(!eStatus) {
-        // poll tcp sockets
-        sock_poll();
-
+        // poll tcp sockets... and send direct commands into i2c is also here
+        sock_poll(kts);
+        // process kt's repeating commands
+        kts->eventloop();
         // check i2c if gpio pin active
         i2c_poll();
         usleep(1000);
     }
     /////////////////////////////////////
 
-
+    // remove kt container class
+    delete kts;
     printf("Closing sockets\r\n");
     sock_done();
     gpio_done();

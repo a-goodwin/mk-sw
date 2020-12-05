@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-int devGetPacket(int devnum, int devId, unsigned char *bufptr);
+int devGetPacket(int devId, unsigned char *bufptr);
 int devSendPacket(int devId, unsigned char *buf, int size);
 
 void i2c_init(void);

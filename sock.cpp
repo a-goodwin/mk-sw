@@ -10,11 +10,12 @@
 #include "rs485test/rs485.h"
 #include "ctime.h"
 #include "cmdpacket.h"
+#include "ethpacket.h"
 
 extern tDevInst uart;
 
-static char sendBuf[1025];
-static char recvBuf[1025];
+static unsigned char sendBuf[1025];
+static unsigned char recvBuf[1025];
 
 //static char packetBuf[256];
 //static int packetSz=0;
@@ -26,6 +27,7 @@ static struct sockaddr_in serv_addr[C_KT_COUNT];
 static int listenfd[C_KT_COUNT];
 
 static int connfd[C_KT_COUNT];
+static cEthCmdParser *ethParser[C_KT_COUNT];
 
 void sock_init(void)
 {
@@ -38,6 +40,7 @@ void sock_init(void)
     memset(&serv_addr, '\0', sizeof(serv_addr));
     memset(sendBuf, '\0', sizeof(sendBuf));
     for (i=0; i<sockCount; i++) {
+        ethParser[i] = new cEthCmdParser();
         connfd[i] = -1;
 
         fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -87,11 +90,14 @@ void sock_send(int i, unsigned char* buf, size_t size)
     }
 }
 
-void sock_poll(void)
+void sock_poll(cKtContainer *kts)
 {
     unsigned short i=0;
     int fd;
     int n=0;
+    int ret;
+    //char* cmdData;
+    cEthCmdParser::tEthCmdBuf *cmd;
     //printf(".\r\n");
     for (i=0; i<sockCount; i++) {
         fd = accept4(listenfd[i], (struct sockaddr*) NULL, NULL, SOCK_NONBLOCK);
@@ -115,16 +121,24 @@ void sock_poll(void)
                 //printf("!\r\n");
                 if (n>0) { // data received!
                     printf(CLKHD " @%i: ", getms1m(), i+sockPortBase);
-                    printPacket((unsigned char*)recvBuf);
-                    // send to i2c
-                    devSendPacket(i, (unsigned char*)recvBuf, n);
-                    //n = write(connfd[i], "OK\r\n", 4);
-                }
+                    printhex("pkt:",(unsigned char*)recvBuf, n);
+                    // TODO: parse eth packet and send to kt container
+                    ret = ethParser[i]->processEthData(recvBuf, n);
+                    if (ret) {
+                        cmd = ethParser[i]->getLastCmd();
+                        // process command to proper kt
+                        if (cmd->flags & FLAG_REPEAT) { //
+                            kts->sendCmdRep(i, cmd->cmd, cmd->psize, cmd->duration, cmd->flags & FLAG_NOWAIT);
+                        } else {
+                            kts->sendCmd(i, cmd->cmd, cmd->psize);
+                        }
+                    }
+                } // if n>0
             } else { // socket is gone
                 printf(CLKHD " %i: %i gone, clearing\r\n", getms1m(), i, connfd[i]);
                 close(connfd[i]);
                 connfd[i]=-1;
-            }
-        }
-    }
+            } // sock gone
+        } // connfd>0
+    } // for i
 }

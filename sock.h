@@ -13,13 +13,14 @@ extern "C" {
 #include <netinet/tcp.h>
 #include <errno.h>
 #include "globals.h"
+#include "cktcontainer.h"
 
 // tcp control vars
 
 
 void sock_init(void);
 void sock_send(int i, unsigned char *buf, size_t size);
-void sock_poll(void);
+void sock_poll(cKtContainer *kts);
 void sock_done(void);
 
 #ifdef __cplusplus

@@ -40,7 +40,7 @@ void i2c_poll(void)
         addr = devAdresses[i];
         // poll that i2c has data
         memset(ibuf, 0, C_FULL_PACKET_SZ+1);
-        psz = devGetPacket(i, addr, ibuf);
+        psz = devGetPacket(addr, ibuf);
         if (psz) {
             if (psz==C_MID_PACKET_SZ) { // am on kt
                 amId = (ibuf[2] << 8) | ibuf[3];
@@ -60,10 +60,10 @@ void i2c_poll(void)
     } // for i
 }
 
-int devGetPacket(int devnum, int devId, unsigned char *bufptr)
+int devGetPacket(int devId, unsigned char *bufptr)
 {
     int ret;
-    tCmdBuf *cmd;
+    //tCmdBuf *cmd;
     unsigned char sz=0;
     //int szreal;
     ////// full buf read

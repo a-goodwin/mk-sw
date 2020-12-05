@@ -12,6 +12,8 @@ typedef unsigned char bool;
 #define CLKHD "%09lu "
 #define SOCK_PORT_BASE 7000
 #define C_KT_COUNT 4
+#define C_CMD_REPEAT_PERIOD_MS 150
+
 #define I2C_LOG_FNAME "/var/log/ip2c.log"
 #define KPN_LOG_FNAME "/var/log/ip2u.log"
 

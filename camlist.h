@@ -4,7 +4,7 @@
 #include "cmdpacket.h"
 
 #define AM_LIST_LEN 8
-#define AM_TOUT_MS 1500
+#define AM_TOUT_MS 2500
 class cAmList
 {
 public:

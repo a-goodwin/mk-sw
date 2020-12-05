@@ -5,6 +5,8 @@ CONFIG -= qt
 
 SOURCES += \
         camlist.cpp \
+        ckt.cpp \
+        cktcontainer.cpp \
         cmdpacket.c \
         ctime.cpp \
         ethpacket.cpp \
@@ -14,10 +16,10 @@ SOURCES += \
         i2cwrite.c \
         kpn-ctrl.c \
         kpn_sock.c \
-        kt-ctrl.c \
+        kt-ctrl.cpp \
         queue.c \
         rs485test/rs485.c \
-        sock.c
+        sock.cpp
 
 INCLUDEPATH += /work/omega/source/staging_dir/target-mipsel_24kc_musl/usr/include
 
@@ -25,6 +27,8 @@ LIBS += -lugpio -lonioni2c -loniondebug
 
 HEADERS += \
     camlist.h \
+    ckt.h \
+    cktcontainer.h \
     cmdpacket.h \
     ctime.h \
     ethpacket.h \
