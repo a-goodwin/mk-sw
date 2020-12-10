@@ -16,11 +16,12 @@
 #include "cmdpacket.h"
 #include "rs485test/rs485.h"
 #include "ctime.h"
+#include "ethpacket.h"
 
 extern tDevInst uart;
 
-static char sendBuf[1025];
-static char recvBuf[1025];
+static unsigned char sendBuf[1025];
+static unsigned char recvBuf[1025];
 
 //static char packetBuf[256];
 //static int packetSz=0;
@@ -30,6 +31,7 @@ static const unsigned short sockPortBase = SOCK_PORT_BASE;
 static struct sockaddr_in serv_addr;
 static int listenfd;
 static int connfd;
+static cEthCmdParser *ethParser;
 
 void kpn_sock_init(void)
 {
@@ -39,6 +41,7 @@ void kpn_sock_init(void)
     printf(CLKHD "sock_init()\r\n", getms1m());
     memset(&serv_addr, '\0', sizeof(serv_addr));
     memset(sendBuf, '\0', sizeof(sendBuf));
+    ethParser = new cEthCmdParser();
     connfd = -1;
 
     fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK , 0);
@@ -71,6 +74,7 @@ void kpn_sock_done(void)
     if (listenfd>0) {
         close(listenfd);
     }
+    delete ethParser;
 }
 
 void kpn_sock_send(unsigned char* buf, size_t size)
@@ -86,6 +90,8 @@ void kpn_sock_poll(void)
 {
     int fd;
     int n=0;
+    int ret;
+    cEthCmdParser::tEthCmdBuf *cmd;
     //printf(".\r\n");
     fd = accept4(listenfd, (struct sockaddr*) NULL, NULL, SOCK_NONBLOCK);
     if (connfd!=fd) {
@@ -106,9 +112,13 @@ void kpn_sock_poll(void)
             //printf("!\r\n");
             if (n>0) { // data received!
                 printf(CLKHD " @%i: packet(%i) ", getms1m(), sockPortBase, n);
-                printPacket((unsigned char*)recvBuf);
-                // send packet to KPN via uart
-                sendPacket(&uart, (unsigned char*)recvBuf, n);
+                printhex("epkt: ",(unsigned char*)recvBuf, n);
+                ret = ethParser->processEthData(recvBuf, n);
+                if (ret) {
+                    cmd = ethParser->getLastCmd();
+                    // send packet to KPN via uart
+                    sendPacket(&uart, cmd->cmd, cmd->psize);
+                }
             }
         } else { // socket is gone
             printf(CLKHD " remote %i gone, clearing\r\n", getms1m(), connfd);

@@ -14,8 +14,8 @@ SOURCES += \
         i2cpacket.cpp \
         i2cread.c \
         i2cwrite.c \
-        kpn-ctrl.c \
-        kpn_sock.c \
+        kpn-ctrl.cpp \
+        kpn_sock.cpp \
         kt-ctrl.cpp \
         queue.c \
         rs485test/rs485.c \

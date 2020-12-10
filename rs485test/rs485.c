@@ -125,7 +125,7 @@ int receiveFSM(tDevInst *dev)
     switch (dev->ppos) {
     case 0: // signature
         if (*pcb!=SLAVE_SIGNATURE) {
-            printf(CLKHD " bad signature: 0x%02x\r\n", getms1m(), *pcb);
+            //printf(CLKHD " bad signature: 0x%02x\r\n", getms1m(), *pcb);
             dev->ppos = 0;
             dev->psize = 0;
             break;

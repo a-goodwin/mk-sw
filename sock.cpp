@@ -7,12 +7,12 @@
 #include <string.h>
 
 #include "i2cpacket.h"
-#include "rs485test/rs485.h"
+//#include "rs485test/rs485.h"
 #include "ctime.h"
 #include "cmdpacket.h"
 #include "ethpacket.h"
 
-extern tDevInst uart;
+//extern tDevInst uart;
 
 static unsigned char sendBuf[1025];
 static unsigned char recvBuf[1025];
@@ -75,6 +75,7 @@ void sock_done(void)
         if (listenfd[i]>0) {
             close(listenfd[i]);
         }
+        delete ethParser[i];
     }
 
     // close all listen socket

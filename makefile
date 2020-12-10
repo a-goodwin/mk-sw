@@ -6,11 +6,11 @@ all: KT-CTRL I2CREAD I2CWRITE KPN-CTRL
 
 KPN-CTRL: kpn-ctrl.o ctime.o rs485.o kpn_sock.o cmdpacket.o
 	@echo "\r\n============== Linking kpn-ctrl =============="
-	$(CC) $(CFLAGS) kpn-ctrl.o ctime.o cmdpacket.o rs485.o kpn_sock.o -o kpn-ctrl $(LDFLAGS)
+	$(CC) $(CFLAGS) kpn-ctrl.o ethpacket.o ctime.o cmdpacket.o rs485.o kpn_sock.o -o kpn-ctrl $(LDFLAGS) -l stdc++
 
 kpn-ctrl.o: 
-	@echo "\r\n============== Compiling kpn-ctrl.c =============="
-	$(CC) -c $(CFLAGS) kpn-ctrl.c
+	@echo "\r\n============== Compiling kpn-ctrl.cpp =============="
+	$(CC) -c $(CFLAGS) kpn-ctrl.cpp
 
 
 
@@ -21,7 +21,7 @@ KT-CTRL: kt-ctrl.o camlist.o ctime.o gpio18.o i2cpacket.o sock.o cmdpacket.o ckt
 	$(LDFLAGS) -l ugpio -l onioni2c -l oniondebug -l stdc++
 
 kt-ctrl.o: 
-	@echo "\r\n============== Compiling kt-ctrl.c =============="
+	@echo "\r\n============== Compiling kt-ctrl.cpp =============="
 	$(CC) -c $(CFLAGS) kt-ctrl.cpp
 
 
@@ -37,8 +37,6 @@ cktcontainer.o: ckt.o
 ethpacket.o: 
 	@echo "\r\n============== Compiling ethpacket.cpp =============="
 	$(CC) -c $(CFLAGS) ethpacket.cpp
-
-
 
 camlist.o:
 	@echo "\r\n============== Compiling camlist.cpp =============="
@@ -61,8 +59,8 @@ sock.o:
 	$(CC) -c $(CFLAGS) sock.cpp
 
 kpn_sock.o:
-	@echo "\r\n============== Compiling kpn_sock.c =============="
-	$(CC) -c $(CFLAGS) kpn_sock.c
+	@echo "\r\n============== Compiling kpn_sock.cpp =============="
+	$(CC) -c $(CFLAGS) kpn_sock.cpp
 
 rs485.o:
 	@echo "\r\n============== Compiling rs485.c =============="

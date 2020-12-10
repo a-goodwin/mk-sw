@@ -27,7 +27,7 @@ public:
 
     struct tEthCmdBuf {
 //        u_int16_t pos; // buffer current position and receive fsm
-        u_int8_t psize; // eth packet header size, if applicable
+        u_int8_t psize; // eth cmd packet real size, if applicable
         u_int8_t flags;
         u_int32_t duration;
         u_int8_t ethsign; // command signature
