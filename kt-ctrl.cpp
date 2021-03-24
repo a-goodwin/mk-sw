@@ -15,6 +15,11 @@
 #include "sock.h"
 #include "gpio18.h"
 #include "ctime.h"
+#include "eventprocessor.h"
+
+
+
+
 
 static const char* ver=VER_STR;
 
@@ -25,6 +30,7 @@ static const char* logFName = I2C_LOG_FNAME;
 static int dMode = 1;
 static bool eStatus = 0;
 
+static CEventProcessor *processor;
 
 //static time_t ticks;
 
@@ -41,7 +47,7 @@ int main(int argc, char **argv, char **envp)
     int value=0, ov=0;
 
     struct sigaction sact;
-
+    processor = new CEventProcessor();
     int ret;
     int opt;
     int nkt = C_KT_COUNT;
@@ -100,10 +106,13 @@ int main(int argc, char **argv, char **envp)
     /////////// main loop ///////////////
     printf("Starting main cycle!\r\n");
     while(!eStatus) {
-        // poll tcp sockets
+        // poll tcp sockets and send commands directly to kt
         sock_poll();
 
-        // check i2c if gpio pin active
+        // poll event-processor timers and do event-action chains
+        processor->eventloop();
+
+        // check i2c if gpio pin active receive commands and send it to PC and to event processor
         i2c_poll();
         usleep(1000);
     }

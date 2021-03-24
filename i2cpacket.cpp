@@ -44,7 +44,7 @@ void i2c_poll(void)
         if (psz) {
             if (psz==C_MID_PACKET_SZ) { // am on kt
                 amId = (ibuf[2] << 8) | ibuf[3];
-                if(!amlist[i].add(amId)) {
+                if(!amlist[i].add(amId)) { // am is alwayas here, on KT. do not send this event to PC and to internal base
                     //printf(CLKHD "0x%04x always here\r\n", getms1m(), amId);
                     continue;
                 }
@@ -54,12 +54,16 @@ void i2c_poll(void)
                 printf(CLKHD "i2c%i 0x%02x: ", getms1m(), i, addr);
                 printhex("", ibuf, psz+1);//printPacket(ibuf+1);
             }
+            // TODO: here should be inserted the am packet transport to event subsystem bridge
+            // processor.event(
 
             sock_send(i, ibuf+1, (size_t)psz);
         }
     } // for i
 }
-
+/* int devGetPacket(int devnum, int devId, unsigned char *bufptr)
+ * check and if ready, gets the packet from i2c device
+ */
 int devGetPacket(int devnum, int devId, unsigned char *bufptr)
 {
     int ret;

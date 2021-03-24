@@ -7,13 +7,14 @@ SOURCES += \
         camlist.cpp \
         cmdpacket.c \
         ctime.cpp \
+        eventprocessor.cpp \
         gpio18.c \
         i2cpacket.cpp \
         i2cread.c \
         i2cwrite.c \
-        kpn-ctrl.c \
+        kpn-ctrl.cpp \
         kpn_sock.c \
-        kt-ctrl.c \
+        kt-ctrl.cpp \
         queue.c \
         rs485test/rs485.c \
         sock.c
@@ -26,6 +27,7 @@ HEADERS += \
     camlist.h \
     cmdpacket.h \
     ctime.h \
+    eventprocessor.h \
     globals.h \
     gpio18.h \
     i2cpacket.h \
