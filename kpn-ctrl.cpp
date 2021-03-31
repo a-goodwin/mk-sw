@@ -39,6 +39,9 @@ void term(int signum);
 int main(int argc, char **argv, char **envp)
 {
 
+    // TODO: Need to write kpn-ctrl to kt-ctrl fifo
+    // create fifo and open for read and non-blocking
+
     struct sigaction sact;
 
     int ret;

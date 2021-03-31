@@ -3,8 +3,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+typedef unsigned long long ctime;
 
-unsigned long long getms(void);
+ctime getms(void);
 unsigned long getms1m(void);
 #ifdef __cplusplus
 }

@@ -1,6 +1,8 @@
 #ifndef CEVENTPROCESSOR_H
 #define CEVENTPROCESSOR_H
+#include "timer.h"
 
+#define MAX_TIMERS 256
 
 class CEventProcessor
 {
@@ -41,6 +43,9 @@ public:
     void slEvent(int evType, int srcId, int dstId, char* data, int dsize);
     void eventFilter(int evType, int srcId, int dstId, char* data, int dsize);
     void slDoAction(int acId);
+    int startTimer(ctime intervalMs, void(*fptr)(timer* from));
+private:
+    timer* timers[MAX_TIMERS];
 
 };
 

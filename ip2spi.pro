@@ -17,7 +17,8 @@ SOURCES += \
         kt-ctrl.cpp \
         queue.c \
         rs485test/rs485.c \
-        sock.c
+        sock.c \
+        timer.cpp
 
 INCLUDEPATH += /work/omega/source/staging_dir/target-mipsel_24kc_musl/usr/include
 
@@ -34,7 +35,8 @@ HEADERS += \
     kpn_sock.h \
     queue.h \
     rs485test/rs485.h \
-    sock.h
+    sock.h \
+    timer.h
 
 SUBDIRS += \
     rs485test/rs485test.pro
