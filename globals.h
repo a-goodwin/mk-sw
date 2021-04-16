@@ -8,10 +8,10 @@
 typedef unsigned char bool;
 #endif
 
-#define VER_STR "0.20 beta (new eth proto, repkt!)"
+#define VER_STR "0.21d beta (new eth proto, repkt!)"
 #define CLKHD "%09lu "
 #define SOCK_PORT_BASE 7000
-#define C_KT_COUNT 4
+#define C_KT_COUNT 10
 #define C_CMD_REPEAT_PERIOD_MS 150
 
 #define I2C_LOG_FNAME "/var/log/ip2c.log"

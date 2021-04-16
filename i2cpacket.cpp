@@ -10,7 +10,7 @@
 #include "ctime.h"
 #include "camlist.h"
 
-static int devAdresses[C_KT_COUNT] = {0x32, 0x34, 0x36, 0x38};
+static int devAdresses[C_KT_COUNT] = {0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a};
 static unsigned char ibuf[BUF_SZ+1]; // i2c to eth packet buffer
 
 static tCmdBuf i2cbuf[C_KT_COUNT];

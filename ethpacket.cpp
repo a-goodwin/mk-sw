@@ -40,7 +40,7 @@ int cEthCmdParser::processEthData(unsigned char *inbuf, int size)
     if (size<1) return 0;
 
     if (inbuf[0]==ETH_VER1_SIGNATURE) { // packet ver1
-        //printf("ethv1p\r\n");
+        printf("ethv1p\r\n");
         if (size<ETH_HDRV1_SIZE) return 0; // bad size for ver1 packet hdr
         ethcmd.flags=inbuf[1];
         ethcmd.psize=size-ETH_HDRV1_SIZE;
@@ -53,7 +53,7 @@ int cEthCmdParser::processEthData(unsigned char *inbuf, int size)
         return ethcmd.psize;
     }
     else if (inbuf[0]==MASTER_SIGNATURE) { // packet ver_old
-        //printf("ethv0p\r\n");
+        printf("ethv0p\r\n");
 //        ethcmd.pos=0;
         ethcmd.flags=0;
         ethcmd.psize=size;

@@ -41,6 +41,7 @@ void kpn_sock_init(void)
     printf(CLKHD "sock_init()\r\n", getms1m());
     memset(&serv_addr, '\0', sizeof(serv_addr));
     memset(sendBuf, '\0', sizeof(sendBuf));
+
     ethParser = new cEthCmdParser();
     connfd = -1;
 

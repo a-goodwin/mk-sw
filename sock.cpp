@@ -37,9 +37,10 @@ void sock_init(void)
     int tr = 1;
 
     printf(CLKHD " sock_init()\r\n", getms1m());
-    memset(&serv_addr, '\0', sizeof(serv_addr));
     memset(sendBuf, '\0', sizeof(sendBuf));
     for (i=0; i<sockCount; i++) {
+        memset(&(serv_addr[i]), '\0', sizeof(serv_addr[i]));
+
         ethParser[i] = new cEthCmdParser();
         connfd[i] = -1;
 
@@ -57,10 +58,10 @@ void sock_init(void)
         serv_addr[i].sin_family = AF_INET;
         serv_addr[i].sin_addr.s_addr = htonl(INADDR_ANY);
         serv_addr[i].sin_port = htons(sockPortBase + i);
-        ret = bind(listenfd[i], (struct sockaddr*)&(serv_addr[i]), sizeof(serv_addr));
-        if (ret<0) printf("error in bind socket %i\r\n", i);
+        ret = bind(listenfd[i], (struct sockaddr*)&(serv_addr[i]), sizeof(serv_addr[i]));
+        if (ret<0) printf("error %i in bind socket %i (port %i)\r\n", errno, i, sockPortBase + i);
         ret = listen(listenfd[i], 1);
-        if (ret<0) printf("error in turn socket to listen state %i\r\n", i);
+        if (ret<0) printf("error %i in turn socket to listen state %i\r\n", errno, i);
     }
 }
 void sock_done(void)
