@@ -46,6 +46,7 @@ public:
     int startTimer(ctime intervalMs, void(*fptr)(timer* from));
 private:
     timer* timers[MAX_TIMERS];
+    int eventshzz;
 
 };
 
