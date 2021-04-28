@@ -111,7 +111,7 @@ int main(int argc, char **argv, char **envp)
         kts->eventloop();
         // check i2c if gpio pin active
         i2c_poll();
-        usleep(1000);
+        usleep(400);
     }
     /////////////////////////////////////
 

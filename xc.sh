@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cd /work/omega/ip2c
-sh /work/omega/ip2c/xCompile.sh -buildroot /work/omega/source -lib "ugpio,onioni2c,oniondeug"
+sh /work/omega/ip2c/_xCompile.sh -buildroot /work/omega/source -lib "ugpio,onioni2c,oniondeug"
 
 echo "\r\nCopy files to Omega"
 cp kt-ctrl ../sysroot/tmp/kt-ctrl

@@ -45,7 +45,7 @@ void i2c_poll(void)
             if (psz==C_MID_PACKET_SZ) { // am on kt
                 amId = (ibuf[2] << 8) | ibuf[3];
                 if(!amlist[i].add(amId)) {
-                    //printf(CLKHD "0x%04x always here\r\n", getms1m(), amId);
+                    printf(CLKHD "0x%04x always here\r\n", getms1m(), amId);
                     continue;
                 }
                 printf(CLKHD "i2c%i 0x%02x: ", getms1m(), i, addr);

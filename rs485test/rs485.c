@@ -122,10 +122,11 @@ int receiveFSM(tDevInst *dev)
     if (Status<=0) return 0;
     // some data received, parse
     pcb = dev->rcvbuf+dev->ppos; // current byte received
+    // TODO: rewrite to add BP signature and packet format!
     switch (dev->ppos) {
     case 0: // signature
         if (*pcb!=SLAVE_SIGNATURE) {
-            //printf(CLKHD " bad signature: 0x%02x\r\n", getms1m(), *pcb);
+            printf(CLKHD " bad signature: 0x%02x\r\n", getms1m(), *pcb);
             dev->ppos = 0;
             dev->psize = 0;
             break;
